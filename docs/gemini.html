@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShruggieTech - Pixel Character Generator</title>
+    <style>
+        :root {
+            --bg-color: #f4f5f7;
+            --panel-bg: #ffffff;
+            --text-color: #333333;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #64748b;
+            --secondary-hover: #475569;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .generator-container {
+            background-color: var(--panel-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            display: flex;
+            flex-wrap: wrap;
+            max-width: 800px;
+            width: 100%;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .controls-panel {
+            flex: 1;
+            min-width: 300px;
+            padding: 2rem;
+            border-right: 1px solid var(--border);
+        }
+
+        .preview-panel {
+            flex: 1;
+            min-width: 300px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8fafc;
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #0f172a;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        select, input[type="color"], input[type="range"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: inherit;
+        }
+
+        input[type="color"] {
+            height: 40px;
+            cursor: pointer;
+            padding: 2px;
+        }
+
+        .svg-container {
+            width: 250px;
+            height: 250px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+            /* Forces pixel-art crispness */
+            shape-rendering: crispEdges; 
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.75rem;
+            width: 100%;
+            justify-content: center;
+        }
+
+        button {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--secondary-hover);
+        }
+
+        @media (max-width: 650px) {
+            .controls-panel { border-right: none; border-bottom: 1px solid var(--border); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="generator-container">
+        <div class="controls-panel">
+            <h2>Shruggie Configurator</h2>
+            
+            <div class="form-group">
+                <label for="mood">Mood / Personality</label>
+                <select id="mood">
+                    <option value="neutral">Neutral ¯\_(ツ)_/¯</option>
+                    <option value="happy">Happy</option>
+                    <option value="confused">Confused</option>
+                    <option value="smug">Smug</option>
+                    <option value="sad">Sad</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="color">Character Color</label>
+                <input type="color" id="color" value="#3b82f6">
+            </div>
+
+            <div class="form-group">
+                <label for="shrug">Shrug Intensity: <span id="shrug-val">5</span></label>
+                <input type="range" id="shrug" min="0" max="10" value="5">
+            </div>
+            
+            <div class="form-group">
+                <label for="accessories">Accessory</label>
+                <select id="accessories">
+                    <option value="none">None</option>
+                    <option value="hat">Top Hat</option>
+                    <option value="glasses">Pixel Glasses</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="preview-panel">
+            <div class="svg-container" id="svg-output">
+                </div>
+            <div class="button-group">
+                <button class="btn-primary" id="btn-download">Download SVG</button>
+                <button class="btn-secondary" id="btn-random">Randomize</button>
+                <button class="btn-secondary" id="btn-reset">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const moodSelect = document.getElementById('mood');
+        const colorInput = document.getElementById('color');
+        const shrugInput = document.getElementById('shrug');
+        const shrugValDisplay = document.getElementById('shrug-val');
+        const accessoriesSelect = document.getElementById('accessories');
+        const svgOutput = document.getElementById('svg-output');
+        
+        // Buttons
+        const btnDownload = document.getElementById('btn-download');
+        const btnRandom = document.getElementById('btn-random');
+        const btnReset = document.getElementById('btn-reset');
+
+        // Defaults
+        const defaultState = {
+            mood: 'neutral',
+            color: '#3b82f6',
+            shrug: 5,
+            accessories: 'none'
+        };
+
+        // Render Function
+        function renderSvg() {
+            const mood = moodSelect.value;
+            const color = colorInput.value;
+            const shrug = parseInt(shrugInput.value, 10);
+            const acc = accessoriesSelect.value;
+            
+            shrugValDisplay.textContent = shrug;
+
+            // Base SVG Grid: 40x40
+            let svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="100%" height="100%">`;
+            
+            // Helper to draw pixel rectangles
+            const drawRect = (x, y, w, h, fill) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" />`;
+
+            // 1. Draw Legs (Stick legs)
+            svgStr += drawRect(17, 30, 2, 7, color);
+            svgStr += drawRect(21, 30, 2, 7, color);
+
+            // 2. Draw Body
+            svgStr += drawRect(15, 20, 10, 10, color);
+
+            // 3. Draw Arms based on Shrug Intensity (0 to 10)
+            // Lower value = lower arms. Higher value = higher arms.
+            const armElevation = shrug; 
+            
+            // Left Arm
+            svgStr += drawRect(7, 24 - armElevation, 8, 2, color); // Upper arm
+            svgStr += drawRect(5, 19 - Math.floor(armElevation * 1.5), 2, 7 + Math.floor(armElevation/2), color); // Forearm
+            svgStr += drawRect(3, 19 - Math.floor(armElevation * 1.5), 4, 2, color); // Hand (Flat palm)
+
+            // Right Arm
+            svgStr += drawRect(25, 24 - armElevation, 8, 2, color); // Upper arm
+            svgStr += drawRect(33, 19 - Math.floor(armElevation * 1.5), 2, 7 + Math.floor(armElevation/2), color); // Forearm
+            svgStr += drawRect(33, 19 - Math.floor(armElevation * 1.5), 4, 2, color); // Hand (Flat palm)
+
+            // 4. Draw Head
+            svgStr += drawRect(12, 8, 16, 12, color);
+
+            // 5. Draw Face (Moods)
+            const faceColor = "#111111";
+            switch(mood) {
+                case 'neutral':
+                    // ツ style
+                    svgStr += drawRect(15, 11, 2, 3, faceColor); // Left Eye
+                    svgStr += drawRect(23, 11, 2, 3, faceColor); // Right Eye
+                    svgStr += drawRect(17, 16, 6, 2, faceColor); // Mouth
+                    svgStr += drawRect(16, 15, 1, 1, faceColor); // Mouth curve L
+                    svgStr += drawRect(23, 15, 1, 1, faceColor); // Mouth curve R
+                    break;
+                case 'happy':
+                    svgStr += drawRect(14, 11, 3, 2, faceColor); // L Eye
+                    svgStr += drawRect(23, 11, 3, 2, faceColor); // R Eye
+                    svgStr += drawRect(16, 16, 8, 3, faceColor); // Open Mouth
+                    break;
+                case 'confused':
+                    svgStr += drawRect(15, 11, 2, 2, faceColor); // Small L Eye
+                    svgStr += drawRect(23, 10, 3, 3, faceColor); // Big R Eye
+                    svgStr += drawRect(18, 16, 4, 2, faceColor); // Flat Mouth
+                    break;
+                case 'smug':
+                    svgStr += drawRect(14, 12, 4, 1, faceColor); // Squint L
+                    svgStr += drawRect(22, 12, 4, 1, faceColor); // Squint R
+                    svgStr += drawRect(15, 16, 7, 1, faceColor); // Smirk
+                    svgStr += drawRect(22, 15, 1, 1, faceColor); // Smirk edge
+                    break;
+                case 'sad':
+                    svgStr += drawRect(14, 13, 3, 1, faceColor); // Sad Eye L
+                    svgStr += drawRect(23, 13, 3, 1, faceColor); // Sad Eye R
+                    svgStr += drawRect(17, 16, 6, 2, faceColor); // Frown
+                    svgStr += drawRect(16, 17, 1, 2, faceColor); // Frown edge L
+                    svgStr += drawRect(23, 17, 1, 2, faceColor); // Frown edge R
+                    break;
+            }
+
+            // 6. Draw Accessories
+            if (acc === 'hat') {
+                svgStr += drawRect(14, 2, 12, 6, '#1a1a1a'); // Top
+                svgStr += drawRect(10, 7, 20, 1, '#1a1a1a'); // Brim
+                svgStr += drawRect(14, 6, 12, 1, '#e11d48'); // Red Ribbon
+            } else if (acc === 'glasses') {
+                svgStr += drawRect(13, 11, 5, 4, '#0f172a'); // L Lens
+                svgStr += drawRect(22, 11, 5, 4, '#0f172a'); // R Lens
+                svgStr += drawRect(18, 12, 4, 1, '#0f172a'); // Bridge
+                svgStr += drawRect(11, 12, 2, 1, '#0f172a'); // L Stem
+                svgStr += drawRect(27, 12, 2, 1, '#0f172a'); // R Stem
+            }
+
+            svgStr += `</svg>`;
+            svgOutput.innerHTML = svgStr;
+        }
+
+        // Event Listeners for Live Preview
+        moodSelect.addEventListener('change', renderSvg);
+        colorInput.addEventListener('input', renderSvg);
+        shrugInput.addEventListener('input', renderSvg);
+        accessoriesSelect.addEventListener('change', renderSvg);
+
+        // Download Logic
+        btnDownload.addEventListener('click', () => {
+            const svgData = svgOutput.innerHTML;
+            const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `shruggie-${moodSelect.value}-${Date.now()}.svg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        });
+
+        // Reset Logic
+        btnReset.addEventListener('click', () => {
+            moodSelect.value = defaultState.mood;
+            colorInput.value = defaultState.color;
+            shrugInput.value = defaultState.shrug;
+            accessoriesSelect.value = defaultState.accessories;
+            renderSvg();
+        });
+
+        // Randomize Logic
+        btnRandom.addEventListener('click', () => {
+            const moods = ['neutral', 'happy', 'confused', 'smug', 'sad'];
+            const accs = ['none', 'hat', 'glasses'];
+            
+            // Random hex color generator
+            const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+            
+            moodSelect.value = moods[Math.floor(Math.random() * moods.length)];
+            accessoriesSelect.value = accs[Math.floor(Math.random() * accs.length)];
+            colorInput.value = randomColor;
+            shrugInput.value = Math.floor(Math.random() * 11); // 0 to 10
+            
+            renderSvg();
+        });
+
+        // Initial Render
+        renderSvg();
+    </script>
+</body>
+</html>

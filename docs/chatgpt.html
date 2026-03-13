@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shruggie SVG Pixel Generator</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --panel: #111827;
+            --panel-2: #1f2937;
+            --text: #e5e7eb;
+            --muted: #94a3b8;
+            --accent: #7c3aed;
+            --accent-2: #22c55e;
+            --border: rgba(255,255,255,0.08);
+            --shadow: 0 18px 50px rgba(0,0,0,0.35);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            min-height: 100%;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(124, 58, 237, 0.18), transparent 32%),
+                radial-gradient(circle at top right, rgba(34, 197, 94, 0.12), transparent 24%),
+                linear-gradient(180deg, #020617 0%, #0f172a 100%);
+            color: var(--text);
+        }
+
+        body {
+            padding: 24px;
+        }
+
+        .app {
+            max-width: 1220px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .panel {
+            background: rgba(17, 24, 39, 0.82);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            border-radius: 22px;
+            backdrop-filter: blur(14px);
+        }
+
+        .controls {
+            padding: 22px;
+            position: sticky;
+            top: 24px;
+        }
+
+        .preview {
+            padding: 24px;
+            min-height: 720px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 1.75rem;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+        }
+
+        .sub {
+            margin: 0 0 22px;
+            color: var(--muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .group {
+            margin-bottom: 18px;
+            padding: 14px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .group-title {
+            margin: 0 0 10px;
+            font-size: 0.95rem;
+            color: #f8fafc;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        label:last-child {
+            margin-bottom: 0;
+        }
+
+        .label-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 6px;
+            font-size: 0.92rem;
+        }
+
+        .label-row span:last-child {
+            color: var(--muted);
+        }
+
+        input[type="range"],
+        select,
+        input[type="color"] {
+            width: 100%;
+        }
+
+        input[type="range"] {
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        select,
+        button,
+        input[type="color"] {
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(15, 23, 42, 0.9);
+            color: var(--text);
+            border-radius: 12px;
+            padding: 10px 12px;
+            font: inherit;
+        }
+
+        input[type="color"] {
+            min-height: 44px;
+            padding: 6px;
+            cursor: pointer;
+        }
+
+        .check-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            color: var(--text);
+            font-size: 0.92rem;
+        }
+
+        .check-row input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent);
+        }
+
+        .preview-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+            min-height: 540px;
+            border-radius: 22px;
+            background:
+                linear-gradient(45deg, rgba(255,255,255,0.03) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.03) 75%),
+                linear-gradient(45deg, rgba(255,255,255,0.03) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.03) 75%);
+            background-size: 24px 24px;
+            background-position: 0 0, 12px 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 22px;
+        }
+
+        .preview-inner {
+            width: min(100%, 620px);
+            aspect-ratio: 1 / 1;
+            display: grid;
+            place-items: center;
+        }
+
+        #svgMount svg {
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+            shape-rendering: crispEdges;
+            filter: drop-shadow(0 18px 20px rgba(0,0,0,0.28));
+        }
+
+        .button-row {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        button {
+            cursor: pointer;
+            transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+            font-weight: 700;
+            min-width: 140px;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            border-color: rgba(255,255,255,0.22);
+        }
+
+        button.primary {
+            background: linear-gradient(135deg, var(--accent), #5b21b6);
+        }
+
+        button.secondary {
+            background: linear-gradient(135deg, #0f172a, #111827);
+        }
+
+        button.fun {
+            background: linear-gradient(135deg, #15803d, #16a34a);
+        }
+
+        .caption {
+            text-align: center;
+            color: var(--muted);
+            margin-top: 14px;
+            font-size: 0.92rem;
+        }
+
+        .footer-note {
+            margin-top: 14px;
+            font-size: 0.82rem;
+            color: #93c5fd;
+            text-align: center;
+        }
+
+        @media (max-width: 980px) {
+            .app {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                position: static;
+            }
+
+            .preview {
+                min-height: auto;
+            }
+
+            .preview-wrap {
+                min-height: 420px;
+            }
+        }
+
+        @media (max-width: 560px) {
+            body {
+                padding: 14px;
+            }
+
+            .controls, .preview {
+                padding: 16px;
+            }
+
+            .button-row {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="app">
+        <section class="panel controls">
+            <h1>Shruggie SVG Pixel Generator</h1>
+            <p class="sub">A tiny self-contained character lab for cute square-format shruggie people based on <strong>¯\_(ツ)_/¯</strong>. Adjust the mood, tweak the face, mess with the shrug, and export the result as SVG like a civilized goblin.</p>
+
+            <div class="group">
+                <p class="group-title">Preset + face</p>
+
+                <label>
+                    <div class="label-row">
+                        <span>Mood / personality</span>
+                    </div>
+                    <select id="mood"></select>
+                </label>
+
+                <label>
+                    <div class="label-row">
+                        <span>Eyes</span>
+                    </div>
+                    <select id="eyes"></select>
+                </label>
+
+                <label>
+                    <div class="label-row">
+                        <span>Mouth</span>
+                    </div>
+                    <select id="mouth"></select>
+                </label>
+            </div>
+
+            <div class="group">
+                <p class="group-title">Style</p>
+
+                <label>
+                    <div class="label-row">
+                        <span>Character color</span>
+                    </div>
+                    <input type="color" id="color" value="#a78bfa">
+                </label>
+
+                <label>
+                    <div class="label-row">
+                        <span>Accessory</span>
+                    </div>
+                    <select id="accessory"></select>
+                </label>
+
+                <label class="check-row">
+                    <span>Outline glow</span>
+                    <input type="checkbox" id="glow" checked>
+                </label>
+
+                <label class="check-row">
+                    <span>Blush cheeks</span>
+                    <input type="checkbox" id="blush" checked>
+                </label>
+            </div>
+
+            <div class="group">
+                <p class="group-title">Pose</p>
+
+                <label>
+                    <div class="label-row">
+                        <span>Shrug intensity</span>
+                        <span id="shrugValue">55</span>
+                    </div>
+                    <input type="range" id="shrug" min="0" max="100" step="1" value="55">
+                </label>
+
+                <label>
+                    <div class="label-row">
+                        <span>Body width</span>
+                        <span id="widthValue">3</span>
+                    </div>
+                    <input type="range" id="bodyWidth" min="2" max="5" step="1" value="3">
+                </label>
+
+                <label>
+                    <div class="label-row">
+                        <span>Leg length</span>
+                        <span id="legsValue">4</span>
+                    </div>
+                    <input type="range" id="legs" min="2" max="6" step="1" value="4">
+                </label>
+            </div>
+        </section>
+
+        <section class="panel preview">
+            <div class="preview-wrap">
+                <div class="preview-inner">
+                    <div id="svgMount" aria-live="polite"></div>
+                </div>
+            </div>
+
+            <div class="button-row">
+                <button class="primary" id="downloadBtn">Download SVG</button>
+                <button class="secondary" id="resetBtn">Reset</button>
+                <button class="fun" id="randomBtn">Randomize</button>
+            </div>
+
+            <p class="caption">Live preview updates instantly. The SVG is generated entirely in-browser with plain HTML, CSS, and JavaScript.</p>
+            <p class="footer-note">Single-file. No build step. No nonsense.</p>
+        </section>
+    </main>
+
+    <script>
+        (() => {
+            const GridSize = 24;
+            const PixelSize = 16;
+            const SvgSize = GridSize * PixelSize;
+
+            const Presets = {
+                neutral: {
+                    label: 'Neutral',
+                    eyes: 'dot',
+                    mouth: 'flat',
+                    shrug: 55,
+                    color: '#a78bfa',
+                    accessory: 'none',
+                    glow: true,
+                    blush: true,
+                    bodyWidth: 3,
+                    legs: 4
+                },
+                happy: {
+                    label: 'Happy',
+                    eyes: 'happy',
+                    mouth: 'smile',
+                    shrug: 45,
+                    color: '#34d399',
+                    accessory: 'spark',
+                    glow: true,
+                    blush: true,
+                    bodyWidth: 3,
+                    legs: 4
+                },
+                confused: {
+                    label: 'Confused',
+                    eyes: 'wide',
+                    mouth: 'squiggle',
+                    shrug: 78,
+                    color: '#60a5fa',
+                    accessory: 'question',
+                    glow: true,
+                    blush: false,
+                    bodyWidth: 3,
+                    legs: 4
+                },
+                smug: {
+                    label: 'Smug',
+                    eyes: 'half',
+                    mouth: 'smirk',
+                    shrug: 60,
+                    color: '#f59e0b',
+                    accessory: 'brow',
+                    glow: true,
+                    blush: false,
+                    bodyWidth: 4,
+                    legs: 3
+                },
+                sad: {
+                    label: 'Sad',
+                    eyes: 'dot',
+                    mouth: 'frown',
+                    shrug: 30,
+                    color: '#c084fc',
+                    accessory: 'tear',
+                    glow: false,
+                    blush: false,
+                    bodyWidth: 2,
+                    legs: 5
+                }
+            };
+
+            const EyeOptions = {
+                dot: 'Dot',
+                happy: 'Happy arc',
+                wide: 'Wide',
+                half: 'Half-lid',
+                wink: 'Wink',
+                x: 'X eyes'
+            };
+
+            const MouthOptions = {
+                flat: 'Flat',
+                smile: 'Smile',
+                smirk: 'Smirk',
+                frown: 'Frown',
+                open: 'Open',
+                squiggle: 'Squiggle'
+            };
+
+            const AccessoryOptions = {
+                none: 'None',
+                spark: 'Spark',
+                question: 'Question bubble',
+                bow: 'Bow',
+                brow: 'Raised brow',
+                tear: 'Tiny tear'
+            };
+
+            const DefaultState = {
+                mood: 'neutral',
+                eyes: Presets.neutral.eyes,
+                mouth: Presets.neutral.mouth,
+                color: Presets.neutral.color,
+                accessory: Presets.neutral.accessory,
+                glow: Presets.neutral.glow,
+                blush: Presets.neutral.blush,
+                shrug: Presets.neutral.shrug,
+                bodyWidth: Presets.neutral.bodyWidth,
+                legs: Presets.neutral.legs
+            };
+
+            const State = structuredClone(DefaultState);
+
+            const Elements = {
+                mood: document.getElementById('mood'),
+                eyes: document.getElementById('eyes'),
+                mouth: document.getElementById('mouth'),
+                color: document.getElementById('color'),
+                accessory: document.getElementById('accessory'),
+                glow: document.getElementById('glow'),
+                blush: document.getElementById('blush'),
+                shrug: document.getElementById('shrug'),
+                bodyWidth: document.getElementById('bodyWidth'),
+                legs: document.getElementById('legs'),
+                shrugValue: document.getElementById('shrugValue'),
+                widthValue: document.getElementById('widthValue'),
+                legsValue: document.getElementById('legsValue'),
+                svgMount: document.getElementById('svgMount'),
+                downloadBtn: document.getElementById('downloadBtn'),
+                resetBtn: document.getElementById('resetBtn'),
+                randomBtn: document.getElementById('randomBtn')
+            };
+
+            function Clamp(Value, Min, Max) {
+                return Math.max(Min, Math.min(Max, Value));
+            }
+
+            function HexToRgb(Hex) {
+                const Clean = Hex.replace('#', '');
+                const Expanded = Clean.length === 3
+                    ? Clean.split('').map(Char => Char + Char).join('')
+                    : Clean;
+                const Int = parseInt(Expanded, 16);
+                return {
+                    r: (Int >> 16) & 255,
+                    g: (Int >> 8) & 255,
+                    b: Int & 255
+                };
+            }
+
+            function MixColors(HexA, HexB, Ratio) {
+                const A = HexToRgb(HexA);
+                const B = HexToRgb(HexB);
+                const Mix = (a, b) => Math.round(a + (b - a) * Ratio);
+                return `rgb(${Mix(A.r, B.r)}, ${Mix(A.g, B.g)}, ${Mix(A.b, B.b)})`;
+            }
+
+            function Shade(Hex, Amount) {
+                const Base = Amount >= 0 ? '#ffffff' : '#000000';
+                const Ratio = Math.abs(Amount);
+                return MixColors(Hex, Base, Ratio);
+            }
+
+            function PopulateSelect(SelectElement, Map) {
+                SelectElement.innerHTML = '';
+                Object.entries(Map).forEach(([Value, LabelOrPreset]) => {
+                    const Option = document.createElement('option');
+                    Option.value = Value;
+                    Option.textContent = typeof LabelOrPreset === 'string' ? LabelOrPreset : LabelOrPreset.label;
+                    SelectElement.appendChild(Option);
+                });
+            }
+
+            function ApplyStateToControls() {
+                Elements.mood.value = State.mood;
+                Elements.eyes.value = State.eyes;
+                Elements.mouth.value = State.mouth;
+                Elements.color.value = State.color;
+                Elements.accessory.value = State.accessory;
+                Elements.glow.checked = State.glow;
+                Elements.blush.checked = State.blush;
+                Elements.shrug.value = State.shrug;
+                Elements.bodyWidth.value = State.bodyWidth;
+                Elements.legs.value = State.legs;
+                Elements.shrugValue.textContent = State.shrug;
+                Elements.widthValue.textContent = State.bodyWidth;
+                Elements.legsValue.textContent = State.legs;
+            }
+
+            function UpdateStateFromControls() {
+                State.mood = Elements.mood.value;
+                State.eyes = Elements.eyes.value;
+                State.mouth = Elements.mouth.value;
+                State.color = Elements.color.value;
+                State.accessory = Elements.accessory.value;
+                State.glow = Elements.glow.checked;
+                State.blush = Elements.blush.checked;
+                State.shrug = Number(Elements.shrug.value);
+                State.bodyWidth = Number(Elements.bodyWidth.value);
+                State.legs = Number(Elements.legs.value);
+                ApplyStateToControls();
+            }
+
+            function ApplyPreset(Key) {
+                const Preset = Presets[Key];
+                if (!Preset) {
+                    return;
+                }
+
+                State.mood = Key;
+                State.eyes = Preset.eyes;
+                State.mouth = Preset.mouth;
+                State.color = Preset.color;
+                State.accessory = Preset.accessory;
+                State.glow = Preset.glow;
+                State.blush = Preset.blush;
+                State.shrug = Preset.shrug;
+                State.bodyWidth = Preset.bodyWidth;
+                State.legs = Preset.legs;
+                ApplyStateToControls();
+                Render();
+            }
+
+            function ResetState() {
+                Object.assign(State, structuredClone(DefaultState));
+                ApplyStateToControls();
+                Render();
+            }
+
+            function RandomItem(List) {
+                return List[Math.floor(Math.random() * List.length)];
+            }
+
+            function RandomHex() {
+                const Hue = Math.floor(Math.random() * 360);
+                return HslToHex(Hue, 70, 68);
+            }
+
+            function HslToHex(H, S, L) {
+                S /= 100;
+                L /= 100;
+                const K = n => (n + H / 30) % 12;
+                const A = S * Math.min(L, 1 - L);
+                const F = n => {
+                    const Color = L - A * Math.max(-1, Math.min(K(n) - 3, Math.min(9 - K(n), 1)));
+                    return Math.round(255 * Color).toString(16).padStart(2, '0');
+                };
+                return `#${F(0)}${F(8)}${F(4)}`;
+            }
+
+            function Randomize() {
+                const MoodKeys = Object.keys(Presets);
+                State.mood = RandomItem(MoodKeys);
+                State.eyes = RandomItem(Object.keys(EyeOptions));
+                State.mouth = RandomItem(Object.keys(MouthOptions));
+                State.color = RandomHex();
+                State.accessory = RandomItem(Object.keys(AccessoryOptions));
+                State.glow = Math.random() > 0.35;
+                State.blush = Math.random() > 0.4;
+                State.shrug = Math.floor(Math.random() * 101);
+                State.bodyWidth = Math.floor(Math.random() * 4) + 2;
+                State.legs = Math.floor(Math.random() * 5) + 2;
+                ApplyStateToControls();
+                Render();
+            }
+
+            function Rect(X, Y, Fill, Pixels = []) {
+                Pixels.push(`<rect x="${X * PixelSize}" y="${Y * PixelSize}" width="${PixelSize}" height="${PixelSize}" fill="${Fill}" />`);
+            }
+
+            function AddSymmetricRow(CenterX, Y, HalfWidth, Fill, Pixels = []) {
+                for (let X = CenterX - HalfWidth; X <= CenterX + HalfWidth; X += 1) {
+                    Rect(X, Y, Fill, Pixels);
+                }
+            }
+
+            function BuildCharacterPixels() {
+                const Pixels = [];
+                const CenterX = 12;
+                const HeadTop = 7;
+                const HeadBottom = 12;
+                const BodyTop = 13;
+                const BodyBottom = 16;
+                const HeadColor = State.color;
+                const HeadHighlight = Shade(HeadColor, 0.18);
+                const HeadShadow = Shade(HeadColor, -0.15);
+                const Dark = '#111827';
+                const Outline = '#0b1120';
+                const Blush = 'rgba(251, 113, 133, 0.45)';
+                const ShirtShade = Shade(State.color, -0.28);
+
+                const ArmLift = Math.round(State.shrug / 17);
+                const ArmRise = Clamp(ArmLift, 0, 5);
+                const PalmY = 11 - ArmRise;
+                const ShoulderY = 14;
+                const ElbowY = Math.max(PalmY + 1, 11);
+                const LeftPalmX = 5;
+                const RightPalmX = 19;
+                const LeftShoulderX = CenterX - (State.bodyWidth + 1);
+                const RightShoulderX = CenterX + (State.bodyWidth + 1);
+
+                for (let Y = HeadTop; Y <= HeadBottom; Y += 1) {
+                    const HalfWidth = Y === HeadTop || Y === HeadBottom ? 2 : 3;
+                    AddSymmetricRow(CenterX, Y, HalfWidth, HeadColor, Pixels);
+                }
+
+                Rect(CenterX - 3, HeadTop, HeadHighlight, Pixels);
+                Rect(CenterX - 2, HeadTop + 1, HeadHighlight, Pixels);
+                Rect(CenterX + 3, HeadBottom, HeadShadow, Pixels);
+                Rect(CenterX + 2, HeadBottom, HeadShadow, Pixels);
+
+                for (let Y = BodyTop; Y <= BodyBottom; Y += 1) {
+                    AddSymmetricRow(CenterX, Y, State.bodyWidth - 1, ShirtShade, Pixels);
+                }
+
+                Rect(CenterX, BodyTop + 1, HeadHighlight, Pixels);
+
+                const LeftHipX = CenterX - 1;
+                const RightHipX = CenterX + 1;
+                for (let Step = 0; Step < State.legs; Step += 1) {
+                    Rect(LeftHipX, BodyBottom + 1 + Step, Dark, Pixels);
+                    Rect(RightHipX, BodyBottom + 1 + Step, Dark, Pixels);
+                }
+
+                Rect(LeftHipX - 1, BodyBottom + State.legs, Dark, Pixels);
+                Rect(RightHipX + 1, BodyBottom + State.legs, Dark, Pixels);
+
+                DrawArm(LeftPalmX, PalmY, LeftShoulderX, ShoulderY, -1, Dark, Pixels, ElbowY);
+                DrawArm(RightPalmX, PalmY, RightShoulderX, ShoulderY, 1, Dark, Pixels, ElbowY);
+
+                Rect(LeftPalmX, PalmY, HeadHighlight, Pixels);
+                Rect(RightPalmX, PalmY, HeadHighlight, Pixels);
+
+                AddFace(CenterX, HeadTop, Dark, Blush, Pixels);
+                AddAccessory(CenterX, HeadTop, Dark, HeadHighlight, Pixels);
+
+                if (State.glow) {
+                    AddGlowHalo(CenterX, HeadTop, Pixels);
+                }
+
+                AddTinyGround(Pixels);
+
+                for (let X = CenterX - 3; X <= CenterX + 3; X += 1) {
+                    Rect(X, HeadTop - 1, Outline, Pixels);
+                    Rect(X, HeadBottom + 1, Outline, Pixels);
+                }
+                for (let Y = HeadTop; Y <= HeadBottom; Y += 1) {
+                    Rect(CenterX - 4, Y, Outline, Pixels);
+                    Rect(CenterX + 4, Y, Outline, Pixels);
+                }
+
+                return Pixels.join('');
+            }
+
+            function DrawArm(PalmX, PalmY, ShoulderX, ShoulderY, Direction, Fill, Pixels, ElbowY) {
+                let X = PalmX;
+                let Y = PalmY;
+                Rect(X, Y, Fill, Pixels);
+
+                while (Y < ElbowY) {
+                    Y += 1;
+                    Rect(X, Y, Fill, Pixels);
+                }
+
+                while ((Direction === -1 && X < ShoulderX) || (Direction === 1 && X > ShoulderX)) {
+                    X += Direction === -1 ? 1 : -1;
+                    Rect(X, Y, Fill, Pixels);
+                }
+
+                while (Y < ShoulderY) {
+                    Y += 1;
+                    Rect(X, Y, Fill, Pixels);
+                }
+            }
+
+            function AddFace(CenterX, HeadTop, Dark, BlushColor, Pixels) {
+                const EyeY = HeadTop + 2;
+                const MouthY = HeadTop + 4;
+                const LeftEyeX = CenterX - 1;
+                const RightEyeX = CenterX + 1;
+
+                switch (State.eyes) {
+                    case 'dot':
+                        Rect(LeftEyeX, EyeY, Dark, Pixels);
+                        Rect(RightEyeX, EyeY, Dark, Pixels);
+                        break;
+                    case 'happy':
+                        Rect(LeftEyeX - 1, EyeY, Dark, Pixels);
+                        Rect(LeftEyeX, EyeY - 1, Dark, Pixels);
+                        Rect(RightEyeX + 1, EyeY, Dark, Pixels);
+                        Rect(RightEyeX, EyeY - 1, Dark, Pixels);
+                        break;
+                    case 'wide':
+                        Rect(LeftEyeX, EyeY - 1, Dark, Pixels);
+                        Rect(LeftEyeX, EyeY, '#ffffff', Pixels);
+                        Rect(LeftEyeX, EyeY, Dark, Pixels);
+                        Rect(RightEyeX, EyeY - 1, Dark, Pixels);
+                        Rect(RightEyeX, EyeY, '#ffffff', Pixels);
+                        Rect(RightEyeX, EyeY, Dark, Pixels);
+                        break;
+                    case 'half':
+                        Rect(LeftEyeX - 1, EyeY - 1, Dark, Pixels);
+                        Rect(LeftEyeX, EyeY, Dark, Pixels);
+                        Rect(RightEyeX + 1, EyeY - 1, Dark, Pixels);
+                        Rect(RightEyeX, EyeY, Dark, Pixels);
+                        break;
+                    case 'wink':
+                        Rect(LeftEyeX - 1, EyeY, Dark, Pixels);
+                        Rect(LeftEyeX, EyeY - 1, Dark, Pixels);
+                        Rect(RightEyeX, EyeY, Dark, Pixels);
+                        break;
+                    case 'x':
+                        Rect(LeftEyeX - 1, EyeY - 1, Dark, Pixels);
+                        Rect(LeftEyeX, EyeY, Dark, Pixels);
+                        Rect(LeftEyeX - 1, EyeY + 1, Dark, Pixels);
+                        Rect(LeftEyeX, EyeY - 1, Dark, Pixels);
+
+                        Rect(RightEyeX + 1, EyeY - 1, Dark, Pixels);
+                        Rect(RightEyeX, EyeY, Dark, Pixels);
+                        Rect(RightEyeX + 1, EyeY + 1, Dark, Pixels);
+                        Rect(RightEyeX, EyeY - 1, Dark, Pixels);
+                        break;
+                }
+
+                switch (State.mouth) {
+                    case 'flat':
+                        Rect(CenterX - 1, MouthY, Dark, Pixels);
+                        Rect(CenterX, MouthY, Dark, Pixels);
+                        Rect(CenterX + 1, MouthY, Dark, Pixels);
+                        break;
+                    case 'smile':
+                        Rect(CenterX - 1, MouthY, Dark, Pixels);
+                        Rect(CenterX, MouthY + 1, Dark, Pixels);
+                        Rect(CenterX + 1, MouthY, Dark, Pixels);
+                        break;
+                    case 'smirk':
+                        Rect(CenterX - 1, MouthY + 1, Dark, Pixels);
+                        Rect(CenterX, MouthY, Dark, Pixels);
+                        Rect(CenterX + 1, MouthY, Dark, Pixels);
+                        break;
+                    case 'frown':
+                        Rect(CenterX - 1, MouthY, Dark, Pixels);
+                        Rect(CenterX, MouthY - 1, Dark, Pixels);
+                        Rect(CenterX + 1, MouthY, Dark, Pixels);
+                        break;
+                    case 'open':
+                        Rect(CenterX, MouthY, Dark, Pixels);
+                        Rect(CenterX, MouthY + 1, Dark, Pixels);
+                        break;
+                    case 'squiggle':
+                        Rect(CenterX - 1, MouthY + 1, Dark, Pixels);
+                        Rect(CenterX, MouthY, Dark, Pixels);
+                        Rect(CenterX + 1, MouthY + 1, Dark, Pixels);
+                        break;
+                }
+
+                if (State.blush) {
+                    Rect(CenterX - 3, MouthY, BlushColor, Pixels);
+                    Rect(CenterX + 3, MouthY, BlushColor, Pixels);
+                }
+            }
+
+            function AddAccessory(CenterX, HeadTop, Dark, Light, Pixels) {
+                switch (State.accessory) {
+                    case 'spark':
+                        Rect(CenterX + 5, HeadTop - 2, '#fde68a', Pixels);
+                        Rect(CenterX + 5, HeadTop - 1, '#fef3c7', Pixels);
+                        Rect(CenterX + 4, HeadTop - 1, '#fde68a', Pixels);
+                        Rect(CenterX + 6, HeadTop - 1, '#fde68a', Pixels);
+                        Rect(CenterX + 5, HeadTop, '#fde68a', Pixels);
+                        break;
+                    case 'question':
+                        Rect(CenterX + 5, HeadTop - 3, '#93c5fd', Pixels);
+                        Rect(CenterX + 6, HeadTop - 3, '#93c5fd', Pixels);
+                        Rect(CenterX + 6, HeadTop - 2, '#93c5fd', Pixels);
+                        Rect(CenterX + 5, HeadTop - 1, '#93c5fd', Pixels);
+                        Rect(CenterX + 5, HeadTop + 1, '#93c5fd', Pixels);
+                        break;
+                    case 'bow':
+                        Rect(CenterX - 4, HeadTop - 1, '#fb7185', Pixels);
+                        Rect(CenterX - 5, HeadTop, '#fb7185', Pixels);
+                        Rect(CenterX - 3, HeadTop, '#fb7185', Pixels);
+                        Rect(CenterX - 4, HeadTop, '#ffe4e6', Pixels);
+                        break;
+                    case 'brow':
+                        Rect(CenterX - 2, HeadTop + 1, Dark, Pixels);
+                        Rect(CenterX - 1, HeadTop, Dark, Pixels);
+                        break;
+                    case 'tear':
+                        Rect(CenterX + 2, HeadTop + 4, '#7dd3fc', Pixels);
+                        Rect(CenterX + 2, HeadTop + 5, '#38bdf8', Pixels);
+                        break;
+                }
+            }
+
+            function AddGlowHalo(CenterX, HeadTop, Pixels) {
+                const Glow = 'rgba(255,255,255,0.08)';
+                const Points = [
+                    [CenterX - 5, HeadTop + 1],
+                    [CenterX + 5, HeadTop + 1],
+                    [CenterX - 4, HeadTop - 1],
+                    [CenterX + 4, HeadTop - 1],
+                    [CenterX - 2, HeadTop - 2],
+                    [CenterX + 2, HeadTop - 2]
+                ];
+
+                Points.forEach(([X, Y]) => Rect(X, Y, Glow, Pixels));
+            }
+
+            function AddTinyGround(Pixels) {
+                const Ground = 'rgba(255,255,255,0.07)';
+                Rect(8, 22, Ground, Pixels);
+                Rect(9, 22, Ground, Pixels);
+                Rect(15, 22, Ground, Pixels);
+                Rect(16, 22, Ground, Pixels);
+            }
+
+            function BuildSvgMarkup() {
+                const Background = Shade(State.color, -0.82);
+                const Background2 = Shade(State.color, -0.74);
+                const CharacterPixels = BuildCharacterPixels();
+
+                return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${SvgSize} ${SvgSize}" width="${SvgSize}" height="${SvgSize}" shape-rendering="crispEdges">
+    <defs>
+        <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="${Background}" />
+            <stop offset="100%" stop-color="${Background2}" />
+        </linearGradient>
+    </defs>
+    <rect width="${SvgSize}" height="${SvgSize}" fill="url(#bg)" rx="${PixelSize * 2}" />
+    <g opacity="0.18">
+        <rect x="${PixelSize * 2}" y="${PixelSize * 2}" width="${PixelSize}" height="${PixelSize}" fill="#ffffff" />
+        <rect x="${PixelSize * 20}" y="${PixelSize * 4}" width="${PixelSize}" height="${PixelSize}" fill="#ffffff" />
+        <rect x="${PixelSize * 4}" y="${PixelSize * 19}" width="${PixelSize}" height="${PixelSize}" fill="#ffffff" />
+    </g>
+    <g>${CharacterPixels}</g>
+</svg>`;
+            }
+
+            function Render() {
+                const SvgMarkup = BuildSvgMarkup();
+                Elements.svgMount.innerHTML = SvgMarkup;
+            }
+
+            function DownloadSvg() {
+                const SvgMarkup = BuildSvgMarkup();
+                const BlobObject = new Blob([SvgMarkup], { type: 'image/svg+xml;charset=utf-8' });
+                const Url = URL.createObjectURL(BlobObject);
+                const Link = document.createElement('a');
+                const SafeMood = State.mood.replace(/[^a-z0-9_-]/gi, '-').toLowerCase();
+                Link.href = Url;
+                Link.download = `shruggie-${SafeMood}.svg`;
+                document.body.appendChild(Link);
+                Link.click();
+                Link.remove();
+                URL.revokeObjectURL(Url);
+            }
+
+            function BindEvents() {
+                Elements.mood.addEventListener('change', event => ApplyPreset(event.target.value));
+
+                [
+                    Elements.eyes,
+                    Elements.mouth,
+                    Elements.color,
+                    Elements.accessory,
+                    Elements.glow,
+                    Elements.blush,
+                    Elements.shrug,
+                    Elements.bodyWidth,
+                    Elements.legs
+                ].forEach(Element => {
+                    Element.addEventListener('input', () => {
+                        UpdateStateFromControls();
+                        Render();
+                    });
+                    Element.addEventListener('change', () => {
+                        UpdateStateFromControls();
+                        Render();
+                    });
+                });
+
+                Elements.downloadBtn.addEventListener('click', DownloadSvg);
+                Elements.resetBtn.addEventListener('click', ResetState);
+                Elements.randomBtn.addEventListener('click', Randomize);
+            }
+
+            function Init() {
+                PopulateSelect(Elements.mood, Presets);
+                PopulateSelect(Elements.eyes, EyeOptions);
+                PopulateSelect(Elements.mouth, MouthOptions);
+                PopulateSelect(Elements.accessory, AccessoryOptions);
+                ApplyStateToControls();
+                BindEvents();
+                Render();
+            }
+
+            Init();
+        })();
+    </script>
+</body>
+</html>
