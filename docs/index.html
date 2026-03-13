@@ -1,0 +1,3031 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shruggie Generator - ShruggieTech</title>
+  <meta name="description" content="Create custom pixel art shruggies with a wide range of emotions, colors, and accessories. Based on the Affective Dynamics Framework by ShruggieTech. Download your unique shruggie as an SVG for use in projects or social media.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #000000;
+      --bg-card: #0A0A0A;
+      --bg-elevated: #111111;
+      --bg-surface: #1A1A1A;
+      --green-bright: #2BCC73;
+      --green-deep: #00AB21;
+      --orange: #FF5300;
+      --gray-light: #D1D3D4;
+      --gray-muted: #6B6B6B;
+      --gray-border: #262626;
+      --text: #FFFFFF;
+      --text-secondary: #D1D3D4;
+      --text-muted: #6B6B6B;
+      --love: #f07898;
+      --evil: #b040d0;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.25rem 1rem 4rem;
+    }
+
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.1rem, 3vw, 1.5rem);
+      font-weight: 700;
+      color: var(--green-bright);
+      text-align: center;
+      margin-bottom: 0.15rem;
+      letter-spacing: 1px;
+    }
+
+    .subtitle {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 1.25rem;
+      letter-spacing: 0.5px;
+    }
+
+    .subtitle a {
+      color: var(--green-bright);
+      text-decoration: none;
+      transition: text-decoration 0.15s;
+    }
+
+    .subtitle a:hover {
+      text-decoration: underline;
+    }
+
+    .app-layout {
+      display: flex;
+      gap: 1.25rem;
+      max-width: 1080px;
+      width: 100%;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* === Preview === */
+    .preview-section {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+      position: sticky;
+      top: 1rem;
+    }
+
+    .preview-frame {
+      width: 280px;
+      height: 280px;
+      border: 2px solid var(--gray-border);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      image-rendering: pixelated;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      transition: background-color 0.2s;
+    }
+
+    .preview-frame.bg-dark {
+      background: #111111;
+    }
+
+    .preview-frame.bg-light {
+      background: #e8e4ec;
+    }
+
+    .preview-frame.bg-transparent {
+      background: repeating-conic-gradient(#bbb 0% 25%, #eee 0% 50%) 50% / 16px 16px;
+    }
+
+    .preview-frame svg {
+      image-rendering: pixelated;
+      width: 240px;
+      height: 240px;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.5rem 0.9rem;
+      border: 2px solid var(--gray-border);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn--green {
+      border-color: var(--green-bright);
+      color: var(--green-bright);
+    }
+
+    .btn--green:hover {
+      background: var(--green-bright);
+      color: #000;
+    }
+
+    .btn--orange {
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+
+    .btn--orange:hover {
+      background: var(--orange);
+      color: #000;
+    }
+
+    /* === Controls === */
+    .controls-section {
+      flex: 1 1 360px;
+      max-width: 540px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .control-group {
+      background: var(--bg-card);
+      border: 1px solid var(--gray-border);
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+    }
+
+    .control-group__header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.25rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .control-group__caret {
+      font-size: 0.55rem;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+      flex-shrink: 0;
+      display: inline-block;
+    }
+
+    .control-group.collapsed .control-group__caret {
+      transform: rotate(-90deg);
+    }
+
+    .control-group__body {
+      transition: none;
+    }
+
+    .control-group.collapsed .control-group__body {
+      display: none;
+    }
+
+    .control-group.collapsed .control-group__header {
+      margin-bottom: 0;
+    }
+
+    .control-group__label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--green-bright);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .control-group__desc {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-bottom: 0.55rem;
+      line-height: 1.35;
+    }
+
+    .control-group__sublabel {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.35rem;
+      font-weight: 600;
+    }
+
+    .mood-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
+
+    .mood-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 500;
+      padding: 0.25rem 0.5rem;
+      border: 2px solid var(--gray-border);
+      border-radius: 4px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .mood-btn:hover {
+      border-color: var(--text-muted);
+      color: var(--text-secondary);
+    }
+
+    .mood-btn.a-good {
+      border-color: var(--green-bright);
+      color: var(--green-bright);
+      background: rgba(43, 204, 115, 0.07);
+    }
+
+    .mood-btn.a-bad {
+      border-color: var(--orange);
+      color: var(--orange);
+      background: rgba(255, 83, 0, 0.07);
+    }
+
+    .mood-btn.a-neutral {
+      border-color: var(--gray-light);
+      color: var(--gray-light);
+      background: rgba(209, 211, 212, 0.07);
+    }
+
+    .mood-section+.mood-section {
+      margin-top: 0.4rem;
+    }
+
+    .disposition-row {
+      display: flex;
+      gap: 0.25rem;
+      margin-top: 0.45rem;
+      padding-top: 0.45rem;
+      border-top: 1px solid var(--gray-border);
+    }
+
+    .disp-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.25rem 0.6rem;
+      border: 2px solid var(--gray-border);
+      border-radius: 4px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      flex: 1;
+      text-align: center;
+    }
+
+    .disp-btn:hover {
+      border-color: var(--text-muted);
+      color: var(--text-secondary);
+    }
+
+    .disp-btn.d-good {
+      border-color: var(--green-bright);
+      color: var(--green-bright);
+      background: rgba(43, 204, 115, 0.1);
+    }
+
+    .disp-btn.d-neutral {
+      border-color: var(--gray-light);
+      color: var(--gray-light);
+      background: rgba(209, 211, 212, 0.07);
+    }
+
+    .disp-btn.d-evil {
+      border-color: var(--evil);
+      color: var(--evil);
+      background: rgba(176, 64, 208, 0.1);
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .slider-row label {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      min-width: 72px;
+      flex-shrink: 0;
+    }
+
+    .slider-row input[type="range"] {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 5px;
+      border-radius: 3px;
+      background: var(--gray-border);
+      outline: none;
+    }
+
+    .slider-row input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      background: var(--green-bright);
+      cursor: pointer;
+      border: 2px solid var(--bg);
+    }
+
+    .slider-row input[type="range"]::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      background: var(--green-bright);
+      cursor: pointer;
+      border: 2px solid var(--bg);
+    }
+
+    .slider-row+.slider-row {
+      margin-top: 0.35rem;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      margin-top: 0.35rem;
+    }
+
+    .checkbox-row input[type="checkbox"] {
+      accent-color: var(--green-bright);
+      width: 14px;
+      height: 14px;
+      cursor: pointer;
+    }
+
+    .checkbox-row label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* Toggle Switch */
+    .toggle-switch-row {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      margin-top: 0.3rem;
+      position: relative;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 36px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: var(--gray-border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      background: var(--text-muted);
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+
+    .toggle-switch input:checked+.toggle-track {
+      background: var(--green-bright);
+    }
+
+    .toggle-switch input:checked+.toggle-track::after {
+      left: 18px;
+      background: #000;
+    }
+
+    .toggle-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .tooltip-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: var(--gray-border);
+      color: var(--text-muted);
+      font-size: 0.55rem;
+      font-weight: 700;
+      cursor: help;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .tooltip-icon .tt-text {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-elevated);
+      border: 1px solid var(--gray-border);
+      border-radius: 5px;
+      padding: 0.4rem 0.55rem;
+      font-size: 0.65rem;
+      font-weight: 400;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .tooltip-icon:hover .tt-text {
+      display: block;
+    }
+
+    .color-row {
+      display: flex;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+    }
+
+    .color-swatch {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .color-swatch:hover {
+      transform: scale(1.15);
+    }
+
+    .color-swatch.active {
+      border-color: #fff;
+      box-shadow: 0 0 6px rgba(255, 255, 255, 0.25);
+    }
+
+    .toggle-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
+
+    .toggle-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 500;
+      padding: 0.25rem 0.5rem;
+      border: 2px solid var(--gray-border);
+      border-radius: 4px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .toggle-btn:hover {
+      border-color: var(--text-muted);
+      color: var(--text-secondary);
+    }
+
+    .toggle-btn.active {
+      border-color: var(--green-bright);
+      color: var(--green-bright);
+      background: rgba(43, 204, 115, 0.07);
+    }
+
+    /* Background card */
+    .bg-row {
+      display: flex;
+      gap: 0.35rem;
+      align-items: center;
+    }
+
+    .bg-chip {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 500;
+      padding: 0.25rem 0.6rem;
+      border: 2px solid var(--gray-border);
+      border-radius: 4px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .bg-chip:hover {
+      border-color: var(--text-muted);
+      color: var(--text-secondary);
+    }
+
+    .bg-chip.active {
+      border-color: var(--green-bright);
+      color: var(--green-bright);
+      background: rgba(43, 204, 115, 0.07);
+    }
+
+    .bg-chip__dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    /* Rules */
+    .rule-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.45rem;
+      padding: 0.3rem 0;
+    }
+
+    .rule-row+.rule-row {
+      border-top: 1px solid var(--gray-border);
+    }
+
+    .rule-row input[type="checkbox"] {
+      accent-color: var(--green-bright);
+      width: 14px;
+      height: 14px;
+      cursor: pointer;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .rule-text {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    .rule-text strong {
+      color: var(--text-secondary);
+    }
+
+    .footer-note {
+      margin-top: 1.5rem;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-align: center;
+      font-style: italic;
+      opacity: 0.5;
+    }
+
+    @media (max-width: 780px) {
+      .app-layout {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .preview-section {
+        position: static;
+      }
+
+      .controls-section {
+        max-width: 420px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>SHRUGGIE GENERATOR</h1>
+  <p class="subtitle">An emotion set based on the <a href="https://gist.github.com/h8rt3rmin8r/f4589f0afb6fcd10d4c499e4a29247ad">Affective Dynamics Framework</a> by <a href="https://shruggie.tech">ShruggieTech</a></p>
+
+  <div class="app-layout">
+
+    <!-- LEFT: Preview -->
+    <div class="preview-section">
+      <div class="preview-frame bg-dark" id="previewFrame">
+        <svg id="shrugSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" shape-rendering="crispEdges"></svg>
+      </div>
+      <div class="button-row">
+        <button class="btn btn--green" onclick="downloadSVG()">Download</button>
+        <button class="btn btn--green" onclick="randomize()">Randomize</button>
+        <button class="btn btn--orange" onclick="resetAll()">Reset</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: Controls -->
+    <div class="controls-section">
+
+      <!-- EMOTION -->
+      <div class="control-group">
+        <div class="control-group__header" onclick="toggleCard(this)"><span class="control-group__caret">&#9660;</span><span class="control-group__label">Emotion</span></div>
+        <div class="control-group__body">
+          <p class="control-group__desc">Select a mood mapped to the Affective Dynamics Framework. Positive, negative, and complex emotional states each produce unique facial expressions and ambient effects.</p>
+          <div class="mood-section">
+            <span class="control-group__sublabel">Positive</span>
+            <div class="mood-grid" id="goodMoodGrid"></div>
+          </div>
+          <div class="mood-section">
+            <span class="control-group__sublabel">Negative</span>
+            <div class="mood-grid" id="badMoodGrid"></div>
+          </div>
+          <div class="mood-section">
+            <span class="control-group__sublabel">Neutral / Complex</span>
+            <div class="mood-grid" id="neutralMoodGrid"></div>
+          </div>
+          <div class="disposition-row" id="dispRow">
+            <button class="disp-btn" data-disp="good" onclick="setDisposition('good')">&#x2728; Good</button>
+            <button class="disp-btn d-neutral" data-disp="neutral" onclick="setDisposition('neutral')">Neutral</button>
+            <button class="disp-btn" data-disp="evil" onclick="setDisposition('evil')">&#x1F480; Evil</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FACE -->
+      <div class="control-group">
+        <div class="control-group__header" onclick="toggleCard(this)"><span class="control-group__caret">&#9660;</span><span class="control-group__label">Face</span></div>
+        <div class="control-group__body">
+          <p class="control-group__desc">Fine-tune the expression. Eye and mouth sliders modify the selected mood's base look with subtle variations in shape and positioning.</p>
+          <div class="slider-row">
+            <label>Eyes</label>
+            <input type="range" id="eyeStyle" min="0" max="4" value="0" oninput="render()">
+          </div>
+          <div class="slider-row">
+            <label>Mouth</label>
+            <input type="range" id="mouthStyle" min="0" max="4" value="0" oninput="render()">
+          </div>
+          <div class="toggle-switch-row">
+            <label class="toggle-switch">
+              <input type="checkbox" id="emptyHead" onchange="render()">
+              <span class="toggle-track"></span>
+            </label>
+            <span class="toggle-label" onclick="document.getElementById('emptyHead').click()">Ghost mode (empty head)</span>
+            <span class="tooltip-icon">?<span class="tt-text">Removes fills and draws the entire character as a monochrome outline using the selected color. Not changed by Randomize.</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLOR -->
+      <div class="control-group">
+        <div class="control-group__header" onclick="toggleCard(this)"><span class="control-group__caret">&#9660;</span><span class="control-group__label">Color</span></div>
+        <div class="control-group__body">
+          <p class="control-group__desc">Set the character's primary color. Body, skin tone, accessories, and leg color are all derived from this selection.</p>
+          <div class="color-row" id="colorRow"></div>
+        </div>
+      </div>
+
+      <!-- BACKGROUND -->
+      <div class="control-group">
+        <div class="control-group__header" onclick="toggleCard(this)"><span class="control-group__caret">&#9660;</span><span class="control-group__label">Background</span></div>
+        <div class="control-group__body">
+          <p class="control-group__desc">Controls the preview backdrop and the downloaded SVG. Transparent mode exports without a background fill, suitable for compositing.</p>
+          <div class="bg-row" id="bgRow">
+            <button class="bg-chip active" data-bg="dark" onclick="setBg('dark')"><span class="bg-chip__dot" style="background:#111"></span>Dark</button>
+            <button class="bg-chip" data-bg="light" onclick="setBg('light')"><span class="bg-chip__dot" style="background:#e8e4ec"></span>Light</button>
+            <button class="bg-chip" data-bg="transparent" onclick="setBg('transparent')"><span class="bg-chip__dot" style="background:repeating-conic-gradient(#bbb 0% 25%,#eee 0% 50%) 50%/6px 6px"></span>Transparent</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- POSE -->
+      <div class="control-group">
+        <div class="control-group__header" onclick="toggleCard(this)"><span class="control-group__caret">&#9660;</span><span class="control-group__label">Pose</span></div>
+        <div class="control-group__body">
+          <p class="control-group__desc">Adjust arm positions independently or lock them together with the mirror toggle. The shrug intensity controls how high the arms raise.</p>
+          <div class="checkbox-row" style="margin-top:0;margin-bottom:0.35rem;">
+            <input type="checkbox" id="mirrorArms" checked onchange="onMirrorChange()">
+            <label for="mirrorArms">Mirror arms</label>
+          </div>
+          <div class="slider-row">
+            <label>Left arm</label>
+            <input type="range" id="leftArm" min="0" max="4" value="2" oninput="onArmChange('left')">
+          </div>
+          <div class="slider-row">
+            <label>Right arm</label>
+            <input type="range" id="rightArm" min="0" max="4" value="2" oninput="onArmChange('right')">
+          </div>
+          <div class="slider-row">
+            <label>Leg stance</label>
+            <input type="range" id="legStance" min="0" max="3" value="1" oninput="render()">
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCESSORIES -->
+      <div class="control-group">
+        <div class="control-group__header" onclick="toggleCard(this)"><span class="control-group__caret">&#9660;</span><span class="control-group__label">Accessories</span></div>
+        <div class="control-group__body">
+          <p class="control-group__desc">Equip cosmetic items. When rules are enabled, conflicting combinations (such as Top Hat with Good disposition's halo) are automatically resolved.</p>
+          <div class="toggle-row" id="accRow"></div>
+        </div>
+      </div>
+
+      <!-- RULES -->
+      <div class="control-group collapsed">
+        <div class="control-group__header" onclick="toggleCard(this)"><span class="control-group__caret">&#9660;</span><span class="control-group__label">Rules</span></div>
+        <div class="control-group__body">
+          <p class="control-group__desc">Safety rails that prevent hard-to-read or messy outputs. All rules are active by default. Disable individual rules for full creative freedom.</p>
+          <div id="rulesContainer"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!--<p class="footer-note">ADF-compatible emotion set &middot; ShruggieTech</p>-->
+
+  <script>
+    (function () {
+      "use strict";
+
+      // ============================================================
+      //  DATA
+      // ============================================================
+
+      var GOOD_MOODS = [{
+          id: "happy",
+          label: "Happy"
+        },
+        {
+          id: "love",
+          label: "In Love"
+        },
+        {
+          id: "excited",
+          label: "Excited"
+        },
+        {
+          id: "proud",
+          label: "Proud"
+        },
+        {
+          id: "serene",
+          label: "Serene"
+        },
+        {
+          id: "trusting",
+          label: "Trusting"
+        }
+      ];
+      var BAD_MOODS = [{
+          id: "sad",
+          label: "Sad"
+        },
+        {
+          id: "angry",
+          label: "Angry"
+        },
+        {
+          id: "fearful",
+          label: "Fearful"
+        },
+        {
+          id: "disgusted",
+          label: "Disgusted"
+        },
+        {
+          id: "exhausted",
+          label: "Exhausted"
+        },
+        {
+          id: "jealous",
+          label: "Jealous"
+        }
+      ];
+      var NEUTRAL_MOODS = [{
+          id: "neutral",
+          label: "Neutral"
+        },
+        {
+          id: "confused",
+          label: "Confused"
+        },
+        {
+          id: "smug",
+          label: "Smug"
+        },
+        {
+          id: "surprised",
+          label: "Surprised"
+        },
+        {
+          id: "mischievous",
+          label: "Mischievous"
+        }
+      ];
+      var ALL_MOODS = GOOD_MOODS.concat(BAD_MOODS, NEUTRAL_MOODS);
+
+      var COLORS = [
+        "#2BCC73", "#00AB21", "#FF5300", "#f0c040", "#e06848", "#50b8e8",
+        "#c870e0", "#f08090", "#e8e0f0", "#f09030", "#70a8f0", "#40c8b0"
+      ];
+
+      var ACCESSORIES = [{
+          id: "tophat",
+          label: "Top Hat"
+        },
+        {
+          id: "bowtie",
+          label: "Bowtie"
+        },
+        {
+          id: "blush",
+          label: "Blush"
+        },
+        {
+          id: "sunglasses",
+          label: "Shades"
+        },
+        {
+          id: "wand",
+          label: "Wand"
+        },
+        {
+          id: "sparkles",
+          label: "Sparkles"
+        },
+        {
+          id: "robe",
+          label: "Robe"
+        }
+      ];
+
+      var RULES = [{
+          id: "adaptiveOutline",
+          label: "Adaptive outlines",
+          desc: "Lightens structural edges (head, body, shoes) on dark backgrounds for visibility. Facial features always stay dark when a head fill is present. In Ghost mode, all strokes use the character color regardless."
+        },
+        {
+          id: "contrastGuard",
+          label: "Prevent low contrast",
+          desc: "Block character colors too similar to the background during Randomize."
+        },
+        {
+          id: "limitAccessories",
+          label: "Limit accessories",
+          desc: "Cap at 3 accessories and resolve conflicts (e.g., Top Hat vs Halo)."
+        },
+        {
+          id: "safeExcited",
+          label: "Safe excited eyes",
+          desc: "Force high-contrast eye color when Excited mood meets a yellow-ish character."
+        },
+        {
+          id: "safeTongue",
+          label: "Safe tongue color",
+          desc: "Adjust tongue/blush tints when character color is red-toned."
+        }
+      ];
+
+      // ============================================================
+      //  STATE
+      // ============================================================
+
+      var DEFAULTS = {
+        mood: "neutral",
+        disposition: "neutral",
+        eyeStyle: 0,
+        mouthStyle: 0,
+        color: "#2BCC73",
+        leftArm: 2,
+        rightArm: 2,
+        mirrorArms: true,
+        legStance: 1,
+        accessories: [],
+        bgMode: "dark",
+        emptyHead: false,
+        rules: {
+          adaptiveOutline: true,
+          contrastGuard: true,
+          limitAccessories: true,
+          safeExcited: true,
+          safeTongue: true
+        }
+      };
+
+      var S = clone(DEFAULTS);
+
+      function clone(o) {
+        return JSON.parse(JSON.stringify(o));
+      }
+
+      // ============================================================
+      //  COLOR UTILS
+      // ============================================================
+
+      function h2r(hex) {
+        return [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];
+      }
+
+      function r2h(r, g, b) {
+        return "#" + [r, g, b].map(function (c) {
+          var h = Math.max(0, Math.min(255, Math.round(c))).toString(16);
+          return h.length < 2 ? "0" + h : h;
+        }).join("");
+      }
+
+      function lighten(hex, a) {
+        var c = h2r(hex);
+        return r2h(c[0] + (255 - c[0]) * a, c[1] + (255 - c[1]) * a, c[2] + (255 - c[2]) * a);
+      }
+
+      function darken(hex, a) {
+        var c = h2r(hex);
+        return r2h(c[0] * (1 - a), c[1] * (1 - a), c[2] * (1 - a));
+      }
+
+      function complement(hex) {
+        var c = h2r(hex);
+        return r2h(255 - c[0], 255 - c[1], 255 - c[2]);
+      }
+
+      function luminance(hex) {
+        var c = h2r(hex);
+        return (0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]) / 255;
+      }
+
+      function isYellowish(hex) {
+        var c = h2r(hex);
+        return c[0] > 180 && c[1] > 150 && c[2] < 120;
+      }
+
+      function isReddish(hex) {
+        var c = h2r(hex);
+        return c[0] > 180 && c[1] < 120 && c[2] < 120;
+      }
+
+      // Get outline color based on rules + background
+      // Structural outlines: head border, body border, shoes, arm marks.
+      // In ghost mode, everything draws in the character color.
+      // In normal mode with adaptive rule ON + dark bg, edges go light
+      // so they pop against the dark background.
+      function getEdge() {
+        if (S.emptyHead) return S.color;
+        if (S.rules.adaptiveOutline) {
+          if (S.bgMode === "dark") return "#d8d4dc";
+          if (S.bgMode === "light") return "#18141c";
+          return "#18141c";
+        }
+        return "#18141c";
+      }
+
+      // Face outlines: eyes, mouth, brows, pupils.
+      // In ghost mode, draws in the character color (same as edges).
+      // In normal mode, ALWAYS dark regardless of adaptive rule,
+      // because facial features sit on the light skin fill and need
+      // contrast against it, not against the page background.
+      function getFace() {
+        if (S.emptyHead) return S.color;
+        return "#18141c";
+      }
+
+      function getBgHex() {
+        if (S.bgMode === "dark") return "#111111";
+        if (S.bgMode === "light") return "#e8e4ec";
+        return null;
+      }
+
+      // ============================================================
+      //  PIXEL HELPERS (48x48 grid)
+      // ============================================================
+
+      function px(x, y, c) {
+        return '<rect x="' + x + '" y="' + y + '" width="1" height="1" fill="' + c + '"/>';
+      }
+
+      function pxB(coords, c) {
+        return coords.map(function (p) {
+          return px(p[0], p[1], c);
+        }).join("");
+      }
+
+      // Draw a filled rect
+      function pxRect(x, y, w, h, c) {
+        return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="' + c + '"/>';
+      }
+
+      // ============================================================
+      //  48x48 CHARACTER LAYOUT
+      //
+      //  Head: centered x=16..31, y=9..24  (16w x 16h rounded)
+      //  Eyes: y=15..17, left center x=20, right center x=27
+      //  Mouth: y=20..22, center x=23-24
+      //  Body: x=18..29, y=25..34
+      //  Legs: y=35..41
+      //  Arms: from shoulders, extending outward
+      // ============================================================
+
+      function hasAcc(id) {
+        return S.accessories.indexOf(id) >= 0;
+      }
+
+      // HEAD shape pixels (interior fill only, no outline)
+      function headFillCoords() {
+        var coords = [];
+        // y=10: x=20..27
+        for (var x = 20; x <= 27; x++) coords.push([x, 10]);
+        // y=11: x=18..29
+        for (var x = 18; x <= 29; x++) coords.push([x, 11]);
+        // y=12..22: x=17..30
+        for (var y = 12; y <= 22; y++) {
+          for (var x = 17; x <= 30; x++) coords.push([x, y]);
+        }
+        // y=23: x=18..29
+        for (var x = 18; x <= 29; x++) coords.push([x, 23]);
+        return coords;
+      }
+
+      function headOutlineCoords() {
+        var coords = [];
+        // top curve
+        for (var x = 20; x <= 27; x++) coords.push([x, 9]);
+        coords.push([19, 10], [28, 10]);
+        coords.push([18, 11], [29, 11]);
+        // sides y=12..22
+        for (var y = 12; y <= 22; y++) {
+          coords.push([16, y]);
+          coords.push([31, y]);
+        }
+        // bottom curve
+        coords.push([17, 23], [30, 23]);
+        for (var x = 18; x <= 29; x++) coords.push([x, 24]);
+        return coords;
+      }
+
+      // ============================================================
+      //  EYES
+      // ============================================================
+
+      function getEyes(mod) {
+        var o = getFace();
+        var w = S.emptyHead ? "none" : "#e8e4ec";
+        var p = o; // pupil color = face outline
+        var s = [];
+        var mood = S.mood;
+
+        // SUNGLASSES override
+        if (hasAcc("sunglasses")) {
+          var lens = S.emptyHead ? darken(S.color, 0.3) : "#1a1a2a";
+          var frame = S.emptyHead ? S.color : (S.rules.adaptiveOutline && S.bgMode === "dark" ? "#444460" : "#222238");
+          // frame bridge
+          s.push(pxRect(18, 15, 12, 1, frame));
+          // left lens
+          s.push(pxRect(18, 16, 5, 2, lens));
+          s.push(pxRect(18, 15, 5, 1, frame));
+          // right lens
+          s.push(pxRect(25, 16, 5, 2, lens));
+          s.push(pxRect(25, 15, 5, 1, frame));
+          // shine
+          s.push(px(19, 16, "#444468"));
+          s.push(px(26, 16, "#444468"));
+          return s.join("");
+        }
+
+        // Pupil shift from eye slider (0..4 mapped to -1..1 for x offset, 0..2 for size tweak)
+        var pShiftX = Math.round((mod - 2) * 0.5); // -1, 0, or 1
+        var pSize = mod >= 3 ? 1 : 0; // bigger pupils at high slider
+
+        // ----- Mood-specific eyes -----
+
+        if (mood === "love") {
+          var hc = S.emptyHead ? S.color : "#f06080";
+          // heart eyes (5x4 each)
+          // Left heart
+          s.push(pxB([
+            [19, 14],
+            [21, 14]
+          ], hc)); // top bumps
+          s.push(pxB([
+            [18, 15],
+            [19, 15],
+            [20, 15],
+            [21, 15],
+            [22, 15]
+          ], hc)); // wide row
+          s.push(pxB([
+            [19, 16],
+            [20, 16],
+            [21, 16]
+          ], hc)); // narrowing
+          s.push(px(20, 17, hc)); // point
+          // Right heart
+          s.push(pxB([
+            [26, 14],
+            [28, 14]
+          ], hc));
+          s.push(pxB([
+            [25, 15],
+            [26, 15],
+            [27, 15],
+            [28, 15],
+            [29, 15]
+          ], hc));
+          s.push(pxB([
+            [26, 16],
+            [27, 16],
+            [28, 16]
+          ], hc));
+          s.push(px(27, 17, hc));
+          return s.join("");
+        }
+
+        if (mood === "excited") {
+          // Star eyes, using contrast-safe color
+          var starC = S.emptyHead ? S.color : "#f0c040";
+          if (!S.emptyHead && S.rules.safeExcited && isYellowish(S.color)) {
+            starC = "#e05030";
+          }
+          // Left star (cross shape)
+          s.push(px(20, 14, starC));
+          s.push(pxB([
+            [19, 15],
+            [20, 15],
+            [21, 15]
+          ], starC));
+          s.push(px(20, 16, starC));
+          s.push(pxB([
+            [19, 14],
+            [21, 14],
+            [19, 16],
+            [21, 16]
+          ], starC)); // diagonals
+          // Right star
+          s.push(px(27, 14, starC));
+          s.push(pxB([
+            [26, 15],
+            [27, 15],
+            [28, 15]
+          ], starC));
+          s.push(px(27, 16, starC));
+          s.push(pxB([
+            [26, 14],
+            [28, 14],
+            [26, 16],
+            [28, 16]
+          ], starC));
+          return s.join("");
+        }
+
+        if (mood === "exhausted") {
+          // X eyes
+          s.push(pxB([
+            [19, 15],
+            [21, 15],
+            [19, 17],
+            [21, 17]
+          ], o)); // left X corners
+          s.push(px(20, 16, o)); // left X center
+          s.push(pxB([
+            [26, 15],
+            [28, 15],
+            [26, 17],
+            [28, 17]
+          ], o));
+          s.push(px(27, 16, o));
+          return s.join("");
+        }
+
+        if (mood === "angry") {
+          // Furrowed brows with glaring eyes
+          s.push(pxB([
+            [18, 14],
+            [19, 14]
+          ], o)); // left brow outer (high)
+          s.push(pxB([
+            [20, 15],
+            [21, 15]
+          ], o)); // left brow inner (low)
+          s.push(pxB([
+            [28, 14],
+            [29, 14]
+          ], o)); // right brow outer
+          s.push(pxB([
+            [26, 15],
+            [27, 15]
+          ], o)); // right brow inner
+          // Pupils below brows
+          s.push(pxB([
+            [20, 16],
+            [20, 17]
+          ], p));
+          s.push(pxB([
+            [27, 16],
+            [27, 17]
+          ], p));
+          return s.join("");
+        }
+
+        if (mood === "fearful") {
+          // Large wide-open eyes with tiny centered pupils
+          // Left eye outline (4w x 4h)
+          s.push(pxB([
+            [19, 14],
+            [20, 14],
+            [21, 14]
+          ], o)); // top
+          s.push(pxB([
+            [18, 15],
+            [22, 15]
+          ], o)); // sides
+          s.push(pxB([
+            [18, 16],
+            [22, 16]
+          ], o));
+          s.push(pxB([
+            [18, 17],
+            [22, 17]
+          ], o));
+          s.push(pxB([
+            [19, 18],
+            [20, 18],
+            [21, 18]
+          ], o)); // bottom
+          // White fill
+          s.push(pxB([
+            [19, 15],
+            [20, 15],
+            [21, 15]
+          ], w));
+          s.push(pxB([
+            [19, 16],
+            [20, 16],
+            [21, 16]
+          ], w));
+          s.push(pxB([
+            [19, 17],
+            [20, 17],
+            [21, 17]
+          ], w));
+          // Tiny centered pupil
+          s.push(px(20, 16, p));
+          // Right eye
+          s.push(pxB([
+            [26, 14],
+            [27, 14],
+            [28, 14]
+          ], o));
+          s.push(pxB([
+            [25, 15],
+            [29, 15]
+          ], o));
+          s.push(pxB([
+            [25, 16],
+            [29, 16]
+          ], o));
+          s.push(pxB([
+            [25, 17],
+            [29, 17]
+          ], o));
+          s.push(pxB([
+            [26, 18],
+            [27, 18],
+            [28, 18]
+          ], o));
+          s.push(pxB([
+            [26, 15],
+            [27, 15],
+            [28, 15]
+          ], w));
+          s.push(pxB([
+            [26, 16],
+            [27, 16],
+            [28, 16]
+          ], w));
+          s.push(pxB([
+            [26, 17],
+            [27, 17],
+            [28, 17]
+          ], w));
+          s.push(px(27, 16, p));
+          return s.join("");
+        }
+
+        if (mood === "disgusted") {
+          // Tight squinting eyes with one brow raised
+          s.push(pxB([
+            [19, 14],
+            [20, 14],
+            [21, 14]
+          ], o)); // left brow (flat, low)
+          s.push(pxB([
+            [27, 13],
+            [28, 13]
+          ], o)); // right brow (raised, skeptical)
+          // Squinted left eye (horizontal slits)
+          s.push(pxB([
+            [19, 16],
+            [20, 16],
+            [21, 16]
+          ], o));
+          s.push(pxB([
+            [18, 15],
+            [22, 15]
+          ], o));
+          // Squinted right eye
+          s.push(pxB([
+            [26, 16],
+            [27, 16],
+            [28, 16]
+          ], o));
+          s.push(pxB([
+            [25, 15],
+            [29, 15]
+          ], o));
+          // Tiny pupils peeking through
+          s.push(px(20, 15, p));
+          s.push(px(27, 15, p));
+          return s.join("");
+        }
+
+        if (mood === "jealous") {
+          // Asymmetric furrowed look, side-glancing
+          s.push(pxB([
+            [18, 14],
+            [19, 15],
+            [20, 15]
+          ], o)); // left brow angled down
+          s.push(pxB([
+            [27, 15],
+            [28, 15],
+            [29, 14]
+          ], o)); // right brow angled
+          // Eyes looking sideways (pupils shifted right)
+          s.push(pxB([
+            [19, 16],
+            [20, 16],
+            [21, 16]
+          ], o)); // left eye
+          s.push(pxB([
+            [26, 16],
+            [27, 16],
+            [28, 16]
+          ], o)); // right eye
+          s.push(px(21, 16, p)); // left pupil far right
+          s.push(px(28, 16, p)); // right pupil far right
+          return s.join("");
+        }
+
+        if (mood === "proud") {
+          // Confident half-closed with slight tilt
+          s.push(pxB([
+            [19, 15],
+            [20, 15],
+            [21, 15]
+          ], o)); // left lid
+          s.push(pxB([
+            [26, 15],
+            [27, 15],
+            [28, 15]
+          ], o)); // right lid
+          s.push(pxB([
+            [19, 16],
+            [20, 16]
+          ], p)); // left pupil peeking
+          s.push(pxB([
+            [27, 16],
+            [28, 16]
+          ], p)); // right pupil
+          return s.join("");
+        }
+
+        if (mood === "serene") {
+          // Gently closed curved eyes
+          s.push(pxB([
+            [19, 16],
+            [20, 15],
+            [21, 16]
+          ], o)); // left arc
+          s.push(pxB([
+            [26, 16],
+            [27, 15],
+            [28, 16]
+          ], o)); // right arc
+          return s.join("");
+        }
+
+        if (mood === "trusting") {
+          // Soft round eyes with visible whites
+          s.push(pxB([
+            [19, 15],
+            [20, 15],
+            [21, 15]
+          ], o)); // left top
+          s.push(pxB([
+            [18, 16],
+            [22, 16]
+          ], o));
+          s.push(pxB([
+            [19, 17],
+            [20, 17],
+            [21, 17]
+          ], o)); // left bottom
+          s.push(pxB([
+            [19, 16],
+            [20, 16],
+            [21, 16]
+          ], w)); // white fill
+          s.push(px(20, 16, p));
+          // Right
+          s.push(pxB([
+            [26, 15],
+            [27, 15],
+            [28, 15]
+          ], o));
+          s.push(pxB([
+            [25, 16],
+            [29, 16]
+          ], o));
+          s.push(pxB([
+            [26, 17],
+            [27, 17],
+            [28, 17]
+          ], o));
+          s.push(pxB([
+            [26, 16],
+            [27, 16],
+            [28, 16]
+          ], w));
+          s.push(px(27, 16, p));
+          return s.join("");
+        }
+
+        if (mood === "surprised") {
+          // Very wide eyes, raised brows
+          s.push(pxB([
+            [19, 13],
+            [20, 13],
+            [21, 13]
+          ], o)); // left brow high
+          s.push(pxB([
+            [26, 13],
+            [27, 13],
+            [28, 13]
+          ], o)); // right brow high
+          // Large eyes
+          s.push(pxB([
+            [19, 15],
+            [20, 15],
+            [21, 15]
+          ], o));
+          s.push(pxB([
+            [18, 16],
+            [22, 16]
+          ], o));
+          s.push(pxB([
+            [18, 17],
+            [22, 17]
+          ], o));
+          s.push(pxB([
+            [19, 18],
+            [20, 18],
+            [21, 18]
+          ], o));
+          s.push(pxB([
+            [19, 16],
+            [20, 16],
+            [21, 16],
+            [19, 17],
+            [20, 17],
+            [21, 17]
+          ], w));
+          s.push(px(20, 17, p));
+          // Right
+          s.push(pxB([
+            [26, 15],
+            [27, 15],
+            [28, 15]
+          ], o));
+          s.push(pxB([
+            [25, 16],
+            [29, 16]
+          ], o));
+          s.push(pxB([
+            [25, 17],
+            [29, 17]
+          ], o));
+          s.push(pxB([
+            [26, 18],
+            [27, 18],
+            [28, 18]
+          ], o));
+          s.push(pxB([
+            [26, 16],
+            [27, 16],
+            [28, 16],
+            [26, 17],
+            [27, 17],
+            [28, 17]
+          ], w));
+          s.push(px(27, 17, p));
+          return s.join("");
+        }
+
+        if (mood === "mischievous") {
+          // Half-lid with pupils shifted to one side
+          s.push(pxB([
+            [19, 15],
+            [20, 15],
+            [21, 15]
+          ], o)); // left lid
+          s.push(pxB([
+            [26, 15],
+            [27, 15],
+            [28, 15]
+          ], o)); // right lid
+          s.push(pxB([
+            [21, 16],
+            [28, 16]
+          ], p)); // pupils shifted right
+          return s.join("");
+        }
+
+        // ----- Standard / slider-driven eyes -----
+
+        if (mood === "happy") {
+          // Closed upward arcs (happy squint)
+          s.push(pxB([
+            [19, 17],
+            [20, 16],
+            [21, 17]
+          ], o));
+          s.push(pxB([
+            [26, 17],
+            [27, 16],
+            [28, 17]
+          ], o));
+          if (mod >= 3) { // wider smile eyes at higher slider
+            s.push(px(18, 17, o));
+            s.push(px(29, 17, o));
+          }
+          return s.join("");
+        }
+
+        if (mood === "sad") {
+          // Droopy eyes
+          s.push(pxB([
+            [19, 15],
+            [20, 15],
+            [21, 15]
+          ], o)); // left eye
+          s.push(pxB([
+            [26, 15],
+            [27, 15],
+            [28, 15]
+          ], o));
+          s.push(px(20, 16, p));
+          s.push(px(27, 16, p));
+          // Droopy outer corners
+          s.push(px(18, 16, o));
+          s.push(px(29, 16, o));
+          if (mod >= 2) { // sad brows
+            s.push(pxB([
+              [19, 13],
+              [20, 14]
+            ], o));
+            s.push(pxB([
+              [28, 13],
+              [27, 14]
+            ], o));
+          }
+          return s.join("");
+        }
+
+        if (mood === "smug") {
+          // Half-lid confident
+          s.push(pxB([
+            [19, 15],
+            [20, 15],
+            [21, 15]
+          ], o));
+          s.push(pxB([
+            [26, 15],
+            [27, 15],
+            [28, 15]
+          ], o));
+          s.push(px(20 + pShiftX, 16, p));
+          s.push(px(27 + pShiftX, 16, p));
+          return s.join("");
+        }
+
+        if (mood === "confused") {
+          // Slightly different-sized eyes, one brow raised
+          s.push(pxB([
+            [27, 13],
+            [28, 13]
+          ], o)); // raised right brow
+          // Left eye: normal
+          s.push(pxB([
+            [19, 15],
+            [20, 15],
+            [21, 15]
+          ], o));
+          s.push(pxB([
+            [18, 16],
+            [22, 16]
+          ], o));
+          s.push(pxB([
+            [19, 17],
+            [20, 17],
+            [21, 17]
+          ], o));
+          s.push(pxB([
+            [19, 16],
+            [20, 16],
+            [21, 16]
+          ], w));
+          s.push(px(20, 16, p));
+          // Right eye: slightly wider
+          s.push(pxB([
+            [26, 14],
+            [27, 14],
+            [28, 14]
+          ], o));
+          s.push(pxB([
+            [25, 15],
+            [29, 15]
+          ], o));
+          s.push(pxB([
+            [25, 16],
+            [29, 16]
+          ], o));
+          s.push(pxB([
+            [26, 17],
+            [27, 17],
+            [28, 17]
+          ], o));
+          s.push(pxB([
+            [26, 15],
+            [27, 15],
+            [28, 15],
+            [26, 16],
+            [27, 16],
+            [28, 16]
+          ], w));
+          s.push(px(27, 16, p));
+          return s.join("");
+        }
+
+        // NEUTRAL: fully slider-driven
+        // mod 0: dot eyes
+        // mod 1: small open eyes
+        // mod 2: round eyes with pupils
+        // mod 3: wider open
+        // mod 4: sleepy/relaxed
+
+        switch (mod) {
+          case 0:
+            s.push(pxB([
+              [20, 16],
+              [27, 16]
+            ], p));
+            break;
+          case 1:
+            s.push(pxB([
+              [20, 15],
+              [20, 16],
+              [27, 15],
+              [27, 16]
+            ], p));
+            break;
+          case 2:
+            s.push(pxB([
+              [19, 15],
+              [20, 15],
+              [21, 15]
+            ], o));
+            s.push(pxB([
+              [18, 16],
+              [22, 16]
+            ], o));
+            s.push(pxB([
+              [19, 17],
+              [20, 17],
+              [21, 17]
+            ], o));
+            s.push(pxB([
+              [19, 16],
+              [20, 16],
+              [21, 16]
+            ], w));
+            s.push(px(20, 16, p));
+            s.push(pxB([
+              [26, 15],
+              [27, 15],
+              [28, 15]
+            ], o));
+            s.push(pxB([
+              [25, 16],
+              [29, 16]
+            ], o));
+            s.push(pxB([
+              [26, 17],
+              [27, 17],
+              [28, 17]
+            ], o));
+            s.push(pxB([
+              [26, 16],
+              [27, 16],
+              [28, 16]
+            ], w));
+            s.push(px(27, 16, p));
+            break;
+          case 3:
+            s.push(pxB([
+              [19, 15],
+              [20, 15],
+              [21, 15]
+            ], o));
+            s.push(pxB([
+              [18, 16],
+              [22, 16]
+            ], o));
+            s.push(pxB([
+              [18, 17],
+              [22, 17]
+            ], o));
+            s.push(pxB([
+              [19, 18],
+              [20, 18],
+              [21, 18]
+            ], o));
+            s.push(pxB([
+              [19, 16],
+              [20, 16],
+              [21, 16],
+              [19, 17],
+              [20, 17],
+              [21, 17]
+            ], w));
+            s.push(px(20, 16, p));
+            s.push(pxB([
+              [26, 15],
+              [27, 15],
+              [28, 15]
+            ], o));
+            s.push(pxB([
+              [25, 16],
+              [29, 16]
+            ], o));
+            s.push(pxB([
+              [25, 17],
+              [29, 17]
+            ], o));
+            s.push(pxB([
+              [26, 18],
+              [27, 18],
+              [28, 18]
+            ], o));
+            s.push(pxB([
+              [26, 16],
+              [27, 16],
+              [28, 16],
+              [26, 17],
+              [27, 17],
+              [28, 17]
+            ], w));
+            s.push(px(27, 16, p));
+            break;
+          case 4:
+            // sleepy half-closed
+            s.push(pxB([
+              [19, 16],
+              [20, 16],
+              [21, 16]
+            ], o));
+            s.push(pxB([
+              [26, 16],
+              [27, 16],
+              [28, 16]
+            ], o));
+            s.push(px(20, 17, p));
+            s.push(px(27, 17, p));
+            break;
+        }
+        return s.join("");
+      }
+
+      // ============================================================
+      //  MOUTH
+      // ============================================================
+
+      function getMouth(mod) {
+        var o = getFace();
+        var tongue = "#e06060";
+        if (S.emptyHead) tongue = lighten(S.color, 0.3);
+        else if (S.rules.safeTongue && isReddish(S.color)) tongue = "#d090d0";
+        var s = [];
+        var mood = S.mood;
+
+        if (mood === "love") {
+          // Gentle smile
+          s.push(pxB([
+            [22, 20],
+            [25, 20]
+          ], o));
+          s.push(pxB([
+            [21, 21],
+            [22, 21],
+            [23, 21],
+            [24, 21],
+            [25, 21],
+            [26, 21]
+          ], o));
+          return s.join("");
+        }
+        if (mood === "excited") {
+          // Big open grin with tongue
+          s.push(pxB([
+            [21, 20],
+            [26, 20]
+          ], o));
+          s.push(pxB([
+            [21, 21],
+            [22, 21],
+            [23, 21],
+            [24, 21],
+            [25, 21],
+            [26, 21]
+          ], o));
+          s.push(pxB([
+            [22, 22],
+            [25, 22]
+          ], o));
+          s.push(pxB([
+            [23, 22],
+            [24, 22]
+          ], tongue));
+          return s.join("");
+        }
+        if (mood === "exhausted") {
+          // Wavy/droopy open mouth with tongue
+          s.push(pxB([
+            [22, 21],
+            [23, 20],
+            [24, 20],
+            [25, 21]
+          ], o));
+          s.push(pxB([
+            [22, 22],
+            [23, 22],
+            [24, 22],
+            [25, 22]
+          ], o));
+          s.push(pxB([
+            [23, 21],
+            [24, 21]
+          ], tongue));
+          return s.join("");
+        }
+        if (mood === "angry") {
+          // Clenched teeth / snarl
+          s.push(pxB([
+            [21, 21],
+            [22, 20],
+            [23, 20],
+            [24, 20],
+            [25, 20],
+            [26, 21]
+          ], o));
+          if (mod >= 2) s.push(pxB([
+            [22, 21],
+            [23, 21],
+            [24, 21],
+            [25, 21]
+          ], o)); // showing teeth line
+          return s.join("");
+        }
+        if (mood === "fearful") {
+          // Small trembling O
+          s.push(pxB([
+            [23, 20],
+            [24, 20]
+          ], o));
+          s.push(pxB([
+            [22, 21],
+            [25, 21]
+          ], o));
+          s.push(pxB([
+            [22, 22],
+            [25, 22]
+          ], o));
+          s.push(pxB([
+            [23, 23],
+            [24, 23]
+          ], o));
+          return s.join("");
+        }
+        if (mood === "disgusted") {
+          // Tongue out, wrinkled
+          s.push(pxB([
+            [21, 20],
+            [22, 20]
+          ], o)); // left lip raised
+          s.push(pxB([
+            [23, 21],
+            [24, 21],
+            [25, 21],
+            [26, 21]
+          ], o)); // lower lip drooping right
+          s.push(pxB([
+            [24, 22],
+            [25, 22]
+          ], tongue)); // tongue poking down-right
+          if (mod >= 2) s.push(px(22, 21, o)); // extra wrinkle
+          return s.join("");
+        }
+        if (mood === "jealous") {
+          // Tight smirk
+          s.push(pxB([
+            [22, 21],
+            [23, 21],
+            [24, 21]
+          ], o));
+          s.push(px(25, 20, o));
+          return s.join("");
+        }
+        if (mood === "proud") {
+          // Confident closed smile
+          s.push(pxB([
+            [22, 20],
+            [25, 20]
+          ], o));
+          s.push(pxB([
+            [22, 21],
+            [23, 21],
+            [24, 21],
+            [25, 21]
+          ], o));
+          return s.join("");
+        }
+        if (mood === "serene") {
+          // Tiny gentle line
+          s.push(pxB([
+            [23, 21],
+            [24, 21]
+          ], o));
+          return s.join("");
+        }
+        if (mood === "trusting") {
+          // Soft open smile
+          s.push(pxB([
+            [22, 20],
+            [25, 20]
+          ], o));
+          s.push(pxB([
+            [22, 21],
+            [23, 21],
+            [24, 21],
+            [25, 21]
+          ], o));
+          return s.join("");
+        }
+        if (mood === "surprised") {
+          // Large O mouth
+          s.push(pxB([
+            [23, 20],
+            [24, 20]
+          ], o));
+          s.push(pxB([
+            [22, 21],
+            [25, 21]
+          ], o));
+          s.push(pxB([
+            [22, 22],
+            [25, 22]
+          ], o));
+          s.push(pxB([
+            [23, 23],
+            [24, 23]
+          ], o));
+          return s.join("");
+        }
+        if (mood === "mischievous") {
+          // Crooked grin
+          s.push(pxB([
+            [22, 21],
+            [23, 21],
+            [24, 21]
+          ], o));
+          s.push(px(25, 20, o));
+          s.push(px(21, 21, o));
+          return s.join("");
+        }
+
+        // STANDARD moods (happy, sad, smug, confused, neutral)
+        if (mood === "happy") {
+          // Smile, width varies by mod
+          var w = mod >= 3 ? 3 : 2;
+          s.push(pxB([
+            [22, 20],
+            [25, 20]
+          ], o));
+          for (var x = 22; x <= 25; x++) s.push(px(x, 21, o));
+          if (w >= 3) {
+            s.push(px(21, 20, o));
+            s.push(px(26, 20, o));
+          }
+          return s.join("");
+        }
+        if (mood === "sad") {
+          // Frown
+          s.push(pxB([
+            [22, 22],
+            [25, 22]
+          ], o));
+          s.push(pxB([
+            [22, 21],
+            [23, 21],
+            [24, 21],
+            [25, 21]
+          ], o));
+          if (mod >= 2) {
+            s.push(px(21, 22, o));
+            s.push(px(26, 22, o));
+          }
+          return s.join("");
+        }
+        if (mood === "smug") {
+          s.push(pxB([
+            [22, 21],
+            [23, 21],
+            [24, 21]
+          ], o));
+          s.push(px(25, 20, o));
+          return s.join("");
+        }
+        if (mood === "confused") {
+          // Wavy uncertain line
+          s.push(pxB([
+            [22, 21],
+            [23, 20],
+            [24, 21],
+            [25, 20]
+          ], o));
+          return s.join("");
+        }
+
+        // NEUTRAL (slider-driven)
+        switch (mod) {
+          case 0:
+            s.push(pxB([
+              [22, 21],
+              [23, 21],
+              [24, 21],
+              [25, 21]
+            ], o));
+            break;
+          case 1:
+            s.push(pxB([
+              [23, 21],
+              [24, 21]
+            ], o));
+            break;
+          case 2:
+            s.push(pxB([
+              [22, 20],
+              [25, 20]
+            ], o));
+            s.push(pxB([
+              [22, 21],
+              [23, 21],
+              [24, 21],
+              [25, 21]
+            ], o));
+            break;
+          case 3:
+            s.push(pxB([
+              [22, 21],
+              [23, 20],
+              [24, 20],
+              [25, 21]
+            ], o));
+            break;
+          case 4:
+            s.push(pxB([
+              [23, 20],
+              [24, 20]
+            ], o));
+            s.push(pxB([
+              [22, 21],
+              [25, 21]
+            ], o));
+            s.push(pxB([
+              [23, 22],
+              [24, 22]
+            ], o));
+            break;
+        }
+        return s.join("");
+      }
+
+      // ============================================================
+      //  EMOTION EXTRAS
+      // ============================================================
+
+      function getExtras() {
+        var s = [];
+        var o = getEdge();
+        var mood = S.mood;
+        // In ghost mode, extras use character color tints for monochrome look
+        var ghost = S.emptyHead;
+
+        if (mood === "confused") {
+          // Question mark to the right of the head
+          var qc = ghost ? lighten(S.color, 0.2) : "#c870e0";
+          s.push(pxB([
+            [33, 11],
+            [34, 11]
+          ], qc));
+          s.push(px(35, 12, qc));
+          s.push(px(34, 13, qc));
+          s.push(px(34, 15, qc)); // dot
+        }
+        if (mood === "fearful") {
+          var fc = ghost ? lighten(S.color, 0.3) : "#70b8f0";
+          s.push(pxB([
+            [32, 16],
+            [32, 17],
+            [32, 18]
+          ], fc));
+        }
+        if (mood === "exhausted") {
+          var zc = ghost ? darken(S.color, 0.2) : "#8888a0";
+          var sc = ghost ? lighten(S.color, 0.3) : "#70b8f0";
+          s.push(pxB([
+            [33, 10],
+            [34, 10]
+          ], zc));
+          s.push(pxB([
+            [35, 8],
+            [36, 8]
+          ], zc));
+          s.push(pxB([
+            [37, 6],
+            [38, 6]
+          ], zc));
+          s.push(pxB([
+            [32, 14],
+            [32, 15]
+          ], sc));
+        }
+        if (mood === "angry") {
+          var ac = ghost ? lighten(S.color, 0.2) : "#f05060";
+          s.push(pxB([
+            [33, 9],
+            [35, 9],
+            [34, 10],
+            [33, 11],
+            [35, 11]
+          ], ac));
+        }
+        if (mood === "love") {
+          var lc = ghost ? lighten(S.color, 0.25) : "#f07898";
+          s.push(pxB([
+            [34, 8],
+            [36, 8]
+          ], lc));
+          s.push(pxB([
+            [34, 9],
+            [35, 9],
+            [36, 9]
+          ], lc));
+          s.push(px(35, 10, lc));
+        }
+        if (mood === "surprised") {
+          var xc = ghost ? lighten(S.color, 0.2) : "#f0c040";
+          s.push(pxB([
+            [33, 10],
+            [33, 11],
+            [33, 12]
+          ], xc));
+          s.push(px(33, 14, xc));
+        }
+        return s.join("");
+      }
+
+      // ============================================================
+      //  ARMS
+      // ============================================================
+
+      function getSingleArm(level, side, color) {
+        var ghost = S.emptyHead;
+        var skin = ghost ? S.color : lighten(color, 0.55);
+        var o = getEdge();
+        var s = [];
+
+        // 48x48 arm positions
+        var LA = [{
+            seg: [
+              [16, 28],
+              [15, 29],
+              [14, 30],
+              [14, 31]
+            ],
+            hand: [
+              [13, 32],
+              [13, 33],
+              [12, 32]
+            ],
+            mark: null
+          },
+          {
+            seg: [
+              [16, 27],
+              [15, 28],
+              [14, 29],
+              [14, 30]
+            ],
+            hand: [
+              [13, 30],
+              [13, 31],
+              [12, 31]
+            ],
+            mark: null
+          },
+          {
+            seg: [
+              [16, 26],
+              [15, 25],
+              [14, 24],
+              [13, 23]
+            ],
+            hand: [
+              [12, 22],
+              [12, 23],
+              [11, 22]
+            ],
+            mark: [10, 21]
+          },
+          {
+            seg: [
+              [16, 25],
+              [15, 24],
+              [14, 23],
+              [13, 22]
+            ],
+            hand: [
+              [12, 21],
+              [12, 22],
+              [11, 21]
+            ],
+            mark: [10, 20]
+          },
+          {
+            seg: [
+              [16, 24],
+              [15, 23],
+              [14, 22],
+              [13, 21]
+            ],
+            hand: [
+              [12, 20],
+              [12, 21],
+              [11, 20]
+            ],
+            mark: [10, 19]
+          }
+        ];
+        var RA = [{
+            seg: [
+              [31, 28],
+              [32, 29],
+              [33, 30],
+              [33, 31]
+            ],
+            hand: [
+              [34, 32],
+              [34, 33],
+              [35, 32]
+            ],
+            mark: null
+          },
+          {
+            seg: [
+              [31, 27],
+              [32, 28],
+              [33, 29],
+              [33, 30]
+            ],
+            hand: [
+              [34, 30],
+              [34, 31],
+              [35, 31]
+            ],
+            mark: null
+          },
+          {
+            seg: [
+              [31, 26],
+              [32, 25],
+              [33, 24],
+              [34, 23]
+            ],
+            hand: [
+              [35, 22],
+              [35, 23],
+              [36, 22]
+            ],
+            mark: [37, 21]
+          },
+          {
+            seg: [
+              [31, 25],
+              [32, 24],
+              [33, 23],
+              [34, 22]
+            ],
+            hand: [
+              [35, 21],
+              [35, 22],
+              [36, 21]
+            ],
+            mark: [37, 20]
+          },
+          {
+            seg: [
+              [31, 24],
+              [32, 23],
+              [33, 22],
+              [34, 21]
+            ],
+            hand: [
+              [35, 20],
+              [35, 21],
+              [36, 20]
+            ],
+            mark: [37, 19]
+          }
+        ];
+
+        var armSet = (side === "left") ? LA : RA;
+        var a = armSet[Math.min(level, 4)];
+
+        s.push(pxB(a.seg, skin));
+        s.push(pxB(a.hand, skin));
+
+        // Wand in right hand
+        if (side === "right" && hasAcc("wand")) {
+          var hx = a.hand[2][0];
+          var hy = a.hand[0][1];
+          var wShaft = ghost ? color : "#c89030";
+          var wHandle = ghost ? darken(color, 0.2) : "#a07020";
+          var wStar = ghost ? lighten(color, 0.3) : "#f0e060";
+          s.push(px(hx, hy, wShaft));
+          s.push(px(hx, hy - 1, wShaft));
+          s.push(px(hx, hy - 2, wHandle));
+          s.push(px(hx, hy - 3, wHandle));
+          // Star tip
+          s.push(px(hx, hy - 4, wStar));
+          s.push(px(hx - 1, hy - 4, wStar));
+          s.push(px(hx + 1, hy - 4, wStar));
+          s.push(px(hx, hy - 5, wStar));
+        }
+
+        if (a.mark && level >= 2) {
+          s.push(px(a.mark[0], a.mark[1], o));
+        }
+        return s.join("");
+      }
+
+      // ============================================================
+      //  LEGS
+      // ============================================================
+
+      function getLegs(stance, color) {
+        var shoe = getEdge();
+        var legC = S.emptyHead ? S.color : darken(color, 0.25);
+        var s = [];
+
+        switch (stance % 4) {
+          case 0: // together
+            s.push(pxB([
+              [22, 35],
+              [22, 36],
+              [22, 37],
+              [22, 38],
+              [22, 39],
+              [25, 35],
+              [25, 36],
+              [25, 37],
+              [25, 38],
+              [25, 39]
+            ], legC));
+            s.push(pxB([
+              [21, 40],
+              [22, 40],
+              [25, 40],
+              [26, 40]
+            ], shoe));
+            break;
+          case 1: // normal
+            s.push(pxB([
+              [20, 35],
+              [20, 36],
+              [20, 37],
+              [20, 38],
+              [20, 39],
+              [27, 35],
+              [27, 36],
+              [27, 37],
+              [27, 38],
+              [27, 39]
+            ], legC));
+            s.push(pxB([
+              [19, 40],
+              [20, 40],
+              [27, 40],
+              [28, 40]
+            ], shoe));
+            break;
+          case 2: // wide
+            s.push(pxB([
+              [18, 35],
+              [18, 36],
+              [17, 37],
+              [17, 38],
+              [17, 39],
+              [29, 35],
+              [29, 36],
+              [30, 37],
+              [30, 38],
+              [30, 39]
+            ], legC));
+            s.push(pxB([
+              [16, 40],
+              [17, 40],
+              [30, 40],
+              [31, 40]
+            ], shoe));
+            break;
+          case 3: // crossed
+            s.push(pxB([
+              [22, 35],
+              [23, 36],
+              [24, 37],
+              [25, 38],
+              [26, 39]
+            ], legC));
+            s.push(pxB([
+              [25, 35],
+              [24, 36],
+              [23, 37],
+              [22, 38],
+              [21, 39]
+            ], legC));
+            s.push(pxB([
+              [20, 40],
+              [21, 40],
+              [26, 40],
+              [27, 40]
+            ], shoe));
+            break;
+        }
+        return s.join("");
+      }
+
+      // ============================================================
+      //  ACCESSORIES
+      // ============================================================
+
+      function getAccessories(color) {
+        var s = [];
+        var o = getEdge();
+        var ghost = S.emptyHead;
+
+        // TOP HAT
+        if (hasAcc("tophat")) {
+          var hd = ghost ? color : darken(color, 0.4);
+          var hb = ghost ? lighten(color, 0.2) : darken(color, 0.15);
+          s.push(pxRect(16, 10, 16, 1, hd));
+          s.push(pxRect(19, 3, 10, 7, hd));
+          s.push(pxRect(19, 8, 10, 1, hb));
+          s.push(pxRect(18, 3, 12, 1, hd));
+        }
+
+        // BOWTIE
+        if (hasAcc("bowtie")) {
+          var bc = ghost ? lighten(color, 0.3) : complement(color);
+          s.push(px(23, 25, bc));
+          s.push(px(24, 25, bc));
+          s.push(pxB([
+            [21, 24],
+            [22, 24],
+            [25, 24],
+            [26, 24]
+          ], bc));
+          s.push(pxB([
+            [21, 26],
+            [22, 26],
+            [25, 26],
+            [26, 26]
+          ], bc));
+          s.push(pxB([
+            [22, 25],
+            [25, 25]
+          ], bc));
+        }
+
+        // BLUSH
+        if (hasAcc("blush")) {
+          var blushC;
+          if (ghost) blushC = lighten(color, 0.35);
+          else if (S.rules.safeTongue && isReddish(color)) blushC = "rgba(200,140,220,0.45)";
+          else blushC = "rgba(240,120,120,0.45)";
+          s.push(pxB([
+            [17, 19],
+            [17, 20],
+            [18, 19],
+            [18, 20]
+          ], blushC));
+          s.push(pxB([
+            [29, 19],
+            [29, 20],
+            [30, 19],
+            [30, 20]
+          ], blushC));
+        }
+
+        // ROBE
+        if (hasAcc("robe")) {
+          var rc = ghost ? darken(color, 0.2) : "#2a1880";
+          var rt = ghost ? lighten(color, 0.3) : "#f0c040";
+          s.push(pxRect(17, 26, 2, 9, rc));
+          s.push(pxRect(29, 26, 2, 9, rc));
+          s.push(pxRect(19, 33, 10, 2, rc));
+          s.push(px(17, 28, rt));
+          s.push(px(30, 29, rt));
+          s.push(px(23, 34, rt));
+          s.push(px(25, 34, rt));
+        }
+
+        // SPARKLES
+        if (hasAcc("sparkles")) {
+          var sp = ghost ? lighten(color, 0.3) : "#f0e860";
+          var sp2 = ghost ? lighten(color, 0.5) : "#ffffff";
+          s.push(px(8, 12, sp));
+          s.push(px(39, 10, sp));
+          s.push(px(6, 22, sp2));
+          s.push(px(41, 20, sp2));
+          s.push(px(10, 6, sp));
+          s.push(px(38, 30, sp));
+          s.push(px(4, 34, sp2));
+          s.push(px(43, 8, sp));
+        }
+
+        // DISPOSITION: HALO (good) or HORNS (evil)
+        if (S.disposition === "good") {
+          var hc = ghost ? lighten(color, 0.4) : "#fff4a0";
+          var hcGlow = ghost ? lighten(color, 0.5) : "rgba(255,244,160,0.4)";
+          if (!hasAcc("tophat")) {
+            s.push(pxRect(20, 7, 8, 1, hc));
+            s.push(px(19, 8, hc));
+            s.push(px(28, 8, hc));
+            s.push(px(21, 6, hcGlow));
+            s.push(px(26, 6, hcGlow));
+          }
+        }
+
+        if (S.disposition === "evil") {
+          var hrc = ghost ? darken(color, 0.2) : "#b02020";
+          if (!hasAcc("tophat")) {
+            s.push(pxB([
+              [17, 10],
+              [17, 9],
+              [18, 8],
+              [18, 7]
+            ], hrc));
+            s.push(pxB([
+              [30, 10],
+              [30, 9],
+              [29, 8],
+              [29, 7]
+            ], hrc));
+          }
+          var aura1 = ghost ? darken(color, 0.35) : "rgba(80,0,120,0.3)";
+          var aura2 = ghost ? darken(color, 0.4) : "rgba(80,0,120,0.2)";
+          s.push(px(15, 14, aura1));
+          s.push(px(32, 14, aura1));
+          s.push(px(14, 20, aura2));
+          s.push(px(33, 20, aura2));
+        }
+
+        return s.join("");
+      }
+
+      // ============================================================
+      //  BODY
+      // ============================================================
+
+      function bodyFillCoords() {
+        var coords = [];
+        // Neck: y=24, x=21..26
+        for (var x = 21; x <= 26; x++) coords.push([x, 24]);
+        // Shoulders and torso: y=25..33, x=18..29
+        for (var y = 25; y <= 33; y++) {
+          var xl = (y <= 25) ? 18 : (y >= 33) ? 20 : 18;
+          var xr = (y <= 25) ? 29 : (y >= 33) ? 27 : 29;
+          for (var x = xl; x <= xr; x++) coords.push([x, y]);
+        }
+        // Waist: y=34, x=21..26
+        for (var x = 21; x <= 26; x++) coords.push([x, 34]);
+        return coords;
+      }
+
+      function bodyOutlineCoords() {
+        var coords = [];
+        // Sides y=25..33
+        for (var y = 25; y <= 33; y++) {
+          if (y < 33) {
+            coords.push([17, y]);
+            coords.push([30, y]);
+          } else {
+            coords.push([19, y]);
+            coords.push([28, y]);
+          }
+        }
+        // Bottom
+        for (var x = 20; x <= 27; x++) coords.push([x, 35]);
+        return coords;
+      }
+
+      // ============================================================
+      //  MAIN RENDER
+      // ============================================================
+
+      function render() {
+        syncState();
+        var c = S.color;
+        var skin = lighten(c, 0.55);
+        var edge = getEdge();
+        var svg = "";
+
+        // Background
+        if (S.bgMode !== "transparent") {
+          svg += pxRect(0, 0, 48, 48, getBgHex());
+        }
+
+        // Head
+        if (!S.emptyHead) {
+          svg += pxB(headFillCoords(), skin);
+        }
+        svg += pxB(headOutlineCoords(), edge);
+
+        // Body (ghost mode: outline only, no fill)
+        if (!S.emptyHead) {
+          svg += pxB(bodyFillCoords(), c);
+        }
+        svg += pxB(bodyOutlineCoords(), edge);
+
+        // Face
+        svg += getEyes(S.eyeStyle);
+        svg += getMouth(S.mouthStyle);
+        svg += getExtras();
+
+        // Arms
+        svg += getSingleArm(S.leftArm, "left", c);
+        svg += getSingleArm(S.rightArm, "right", c);
+
+        // Legs
+        svg += getLegs(S.legStance, c);
+
+        // Accessories (last = on top)
+        svg += getAccessories(c);
+
+        document.getElementById("shrugSvg").innerHTML = svg;
+      }
+
+      function syncState() {
+        S.eyeStyle = +document.getElementById("eyeStyle").value;
+        S.mouthStyle = +document.getElementById("mouthStyle").value;
+        S.leftArm = +document.getElementById("leftArm").value;
+        S.rightArm = +document.getElementById("rightArm").value;
+        S.legStance = +document.getElementById("legStance").value;
+        S.mirrorArms = document.getElementById("mirrorArms").checked;
+        S.emptyHead = document.getElementById("emptyHead").checked;
+      }
+
+      // ============================================================
+      //  RULES ENGINE
+      // ============================================================
+
+      function applyRulesToRandomState() {
+        // Contrast guard: prevent colors too close to bg
+        if (S.rules.contrastGuard) {
+          var bgHex = getBgHex();
+          if (bgHex) {
+            var bgLum = luminance(bgHex);
+            var attempts = 0;
+            while (attempts < 10) {
+              var cLum = luminance(S.color);
+              var diff = Math.abs(cLum - bgLum);
+              if (diff < 0.2) {
+                S.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+                attempts++;
+              } else {
+                break;
+              }
+            }
+          }
+        }
+
+        // Limit accessories
+        if (S.rules.limitAccessories) {
+          // Max 3
+          while (S.accessories.length > 3) {
+            S.accessories.splice(Math.floor(Math.random() * S.accessories.length), 1);
+          }
+          // Top hat + good disposition is fine (halo won't render when hat is on)
+          // Sunglasses + tophat is fine
+          // Robe + bowtie conflict (robe covers bowtie)
+          if (hasAcc("robe") && hasAcc("bowtie")) {
+            S.accessories.splice(S.accessories.indexOf("bowtie"), 1);
+          }
+        }
+      }
+
+      // ============================================================
+      //  UI BUILDERS
+      // ============================================================
+
+      function buildMoodGrids() {
+        buildGrid("goodMoodGrid", GOOD_MOODS, "a-good");
+        buildGrid("badMoodGrid", BAD_MOODS, "a-bad");
+        buildGrid("neutralMoodGrid", NEUTRAL_MOODS, "a-neutral");
+      }
+
+      function buildGrid(id, moods, cls) {
+        var g = document.getElementById(id);
+        g.innerHTML = "";
+        moods.forEach(function (m) {
+          var b = document.createElement("button");
+          b.className = "mood-btn" + (S.mood === m.id ? " " + cls : "");
+          b.textContent = m.label;
+          b.addEventListener("click", function () {
+            S.mood = m.id;
+            buildMoodGrids();
+            render();
+          });
+          g.appendChild(b);
+        });
+      }
+
+      function buildDispositionRow() {
+        document.querySelectorAll(".disp-btn").forEach(function (b) {
+          var d = b.getAttribute("data-disp");
+          b.className = "disp-btn" + (S.disposition === d ? " d-" + d : "");
+        });
+      }
+
+      window.setDisposition = function (d) {
+        S.disposition = d;
+        buildDispositionRow();
+        render();
+      };
+
+      function buildColorRow() {
+        var r = document.getElementById("colorRow");
+        r.innerHTML = "";
+        COLORS.forEach(function (c) {
+          var sw = document.createElement("div");
+          sw.className = "color-swatch" + (S.color === c ? " active" : "");
+          sw.style.backgroundColor = c;
+          sw.addEventListener("click", function () {
+            S.color = c;
+            buildColorRow();
+            render();
+          });
+          r.appendChild(sw);
+        });
+      }
+
+      function buildAccessoryRow() {
+        var r = document.getElementById("accRow");
+        r.innerHTML = "";
+        ACCESSORIES.forEach(function (a) {
+          var b = document.createElement("button");
+          b.className = "toggle-btn" + (hasAcc(a.id) ? " active" : "");
+          b.textContent = a.label;
+          b.addEventListener("click", function () {
+            var i = S.accessories.indexOf(a.id);
+            if (i >= 0) S.accessories.splice(i, 1);
+            else S.accessories.push(a.id);
+            buildAccessoryRow();
+            render();
+          });
+          r.appendChild(b);
+        });
+      }
+
+      function buildRules() {
+        var c = document.getElementById("rulesContainer");
+        c.innerHTML = "";
+        RULES.forEach(function (rule) {
+          var row = document.createElement("div");
+          row.className = "rule-row";
+          var cb = document.createElement("input");
+          cb.type = "checkbox";
+          cb.checked = S.rules[rule.id];
+          cb.addEventListener("change", function () {
+            S.rules[rule.id] = cb.checked;
+            render();
+          });
+          var txt = document.createElement("div");
+          txt.className = "rule-text";
+          txt.innerHTML = "<strong>" + rule.label + ":</strong> " + rule.desc;
+          row.appendChild(cb);
+          row.appendChild(txt);
+          c.appendChild(row);
+        });
+      }
+
+      // ============================================================
+      //  ARM MIRROR
+      // ============================================================
+
+      window.onArmChange = function (which) {
+        if (S.mirrorArms) {
+          var v = document.getElementById(which === "left" ? "leftArm" : "rightArm").value;
+          document.getElementById("leftArm").value = v;
+          document.getElementById("rightArm").value = v;
+        }
+        render();
+      };
+
+      window.onMirrorChange = function () {
+        if (document.getElementById("mirrorArms").checked) {
+          document.getElementById("rightArm").value = document.getElementById("leftArm").value;
+        }
+        render();
+      };
+
+      // ============================================================
+      //  BACKGROUND
+      // ============================================================
+
+      window.setBg = function (mode) {
+        S.bgMode = mode;
+        var f = document.getElementById("previewFrame");
+        f.className = "preview-frame bg-" + mode;
+        document.querySelectorAll(".bg-chip").forEach(function (b) {
+          b.classList.toggle("active", b.getAttribute("data-bg") === mode);
+        });
+        render();
+      };
+
+      // ============================================================
+      //  ACTIONS
+      // ============================================================
+
+      window.resetAll = function () {
+        var ghostWas = S.emptyHead;
+        S = clone(DEFAULTS);
+        S.emptyHead = ghostWas; // preserve ghost mode on reset too? No, reset = full reset.
+        S = clone(DEFAULTS);
+        pushStateToUI();
+        render();
+      };
+
+      window.randomize = function () {
+        var ghostWas = S.emptyHead; // preserve ghost mode per tooltip contract
+        var rulesWere = clone(S.rules);
+
+        S.mood = ALL_MOODS[Math.floor(Math.random() * ALL_MOODS.length)].id;
+        var disps = ["good", "neutral", "evil"];
+        S.disposition = disps[Math.floor(Math.random() * disps.length)];
+        S.eyeStyle = Math.floor(Math.random() * 5);
+        S.mouthStyle = Math.floor(Math.random() * 5);
+        S.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+        S.leftArm = Math.floor(Math.random() * 5);
+        S.rightArm = S.mirrorArms ? S.leftArm : Math.floor(Math.random() * 5);
+        S.legStance = Math.floor(Math.random() * 4);
+        S.emptyHead = ghostWas;
+        S.rules = rulesWere;
+        S.accessories = ACCESSORIES.filter(function () {
+          return Math.random() > 0.7;
+        }).map(function (a) {
+          return a.id;
+        });
+
+        applyRulesToRandomState();
+        pushStateToUI();
+        render();
+      };
+
+      function pushStateToUI() {
+        document.getElementById("eyeStyle").value = S.eyeStyle;
+        document.getElementById("mouthStyle").value = S.mouthStyle;
+        document.getElementById("leftArm").value = S.leftArm;
+        document.getElementById("rightArm").value = S.rightArm;
+        document.getElementById("legStance").value = S.legStance;
+        document.getElementById("mirrorArms").checked = S.mirrorArms;
+        document.getElementById("emptyHead").checked = S.emptyHead;
+        setBg(S.bgMode);
+        buildMoodGrids();
+        buildDispositionRow();
+        buildColorRow();
+        buildAccessoryRow();
+        buildRules();
+      }
+
+      window.downloadSVG = function () {
+        var el = document.getElementById("shrugSvg");
+        var str = new XMLSerializer().serializeToString(el);
+        var blob = new Blob([str], {
+          type: "image/svg+xml;charset=utf-8"
+        });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = "shruggie.svg";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      };
+
+      window.toggleCard = function (headerEl) {
+        var card = headerEl.parentElement;
+        card.classList.toggle("collapsed");
+      };
+
+      window.render = render;
+
+      // ============================================================
+      //  INIT
+      // ============================================================
+
+      pushStateToUI();
+      render();
+
+    })();
+  </script>
+</body>
+
+</html>
