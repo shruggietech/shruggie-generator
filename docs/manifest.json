@@ -1,0 +1,53 @@
+{
+  "name": "Shruggie Generator",
+  "short_name": "Shruggie",
+  "description": "Pixel-art character generator with an ADF-compatible emotion set by ShruggieTech",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#2BCC73",
+  "background_color": "#000000",
+  "categories": [
+    "utilities",
+    "entertainment"
+  ],
+  "icons": [
+    {
+      "src": "assets/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "assets/ShruggieFace-64x64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/ShruggieFace-256x256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/ShruggieFace-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/ShruggieFace-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/ShruggieShrug-512x288.jpg",
+      "sizes": "512x288",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "Shruggie Generator preview"
+    }
+  ]
+}
